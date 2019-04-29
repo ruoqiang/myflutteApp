@@ -73,7 +73,7 @@ class _HomeTestPageState extends State<HomeTestPage> {
       dio.options.contentType = ContentType.parse("application/x-www-form-urlencoded");
 
       var formData = {'lon':'115.02932','lat':'35.76189'};
-      response = await dio.post("http://test.baixingliangfan.cn/baixing/wxmini/homePageContent", data: formData);
+      response = await dio.post("http://v.jspang.com:8088/baixing/wxmini/homePageContent", data: formData);
       
       var result = response;//json.decode(response.toString());
 

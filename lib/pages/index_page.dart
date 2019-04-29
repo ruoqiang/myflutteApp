@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:myflutterapp/pages/home_test.dart';
 import 'package:myflutterapp/pages/login.dart';
 import 'package:myflutterapp/pages/register.dart';
 import '../pages/home.dart';
@@ -61,7 +62,7 @@ class _IndexPageState extends State<IndexPage> {
            ),
          ];
 
-    final pageList = [RegisterPage(),SearchPage(),ShopCart(),UserCenterPage()];
+    final pageList = [HomeTestPage(),SearchPage(),ShopCart(),UserCenterPage()];
     @override
     Widget build(BuildContext context) {
 //      setState(() {

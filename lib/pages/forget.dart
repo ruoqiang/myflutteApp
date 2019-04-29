@@ -1,7 +1,9 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
+import 'package:myflutterapp/base_widgit/create_my_input.dart';
 import 'package:myflutterapp/pages/details_page.dart';
 import 'package:myflutterapp/pages/login.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../routers/application.dart';
 import 'package:myflutterapp/base_widgit/appbar.dart';
 
@@ -14,6 +16,31 @@ class _ForgetState extends State<ForgetPage> {
   var tipsText = '';
   var isOpen = false;
   var pressAttention = false;
+//手机号的控制器
+  TextEditingController phoneController = TextEditingController();
+  //密码的控制器
+  TextEditingController passwordController = TextEditingController();
+  @override
+  void initState() {
+    getValueFromLocalToForm();
+    super.initState();
+  }
+  //获取本地持久化数据
+  getValueFromLocalToForm() async {
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+
+    if(_prefs.getString('mobile')!=null) {
+      setState(() {
+        phoneController.text = _prefs.getString('mobile');
+      });
+    }
+  }
+   //设置本地持久化数据
+  setValueToLocal() async{
+    SharedPreferences  _prefs =  await SharedPreferences.getInstance();
+    _prefs.setString('mobile',phoneController.text);
+  }
+  
   @override
   Widget build(BuildContext context) {
 
@@ -24,10 +51,11 @@ class _ForgetState extends State<ForgetPage> {
             child: Column(
               children: <Widget>[
                 MyAppBar(title:'忘记密码',isHasBackBtn:true),
-                createMyInput('images/login_icon_phone.png',"请输入手机号",false),
+                CreateMyInput(iconString:'images/login_icon_phone.png',placeholder:"请输入手机号",isPassword:false,inputController:phoneController),
                 Stack(
                   children: <Widget>[
-                    createMyInput('images/login_icon_code.png',"请输入密码",isOpen),
+                    CreateMyInput(iconString:'images/login_icon_code.png',placeholder:"请输入密码",isPassword:false,inputController:passwordController),
+                   
                     Positioned(
                       top:-5,
                       right: 20,
@@ -51,7 +79,7 @@ class _ForgetState extends State<ForgetPage> {
                 ),
                 Stack(
                   children: <Widget>[
-                    createMyInput('images/login_register_icon_verification.png',"请输入密码",false),
+                    CreateMyInput(iconString:'images/login_icon_code.png',placeholder:"请输入验证码",isPassword:false,inputController:passwordController),
                     Positioned(
                       top:3,
                       right: 20,
@@ -119,7 +147,10 @@ class _ForgetState extends State<ForgetPage> {
                           onPressed: (){
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => LoginPage()),
+                              MaterialPageRoute(builder: (context) {
+                                setValueToLocal();
+                                return LoginPage();
+                              }),
                             );
 //                            Navigator.pushNamed(context, "router/login_page");
 //                            Application.router.navigateTo(context,"/login_page");
@@ -141,32 +172,4 @@ class _ForgetState extends State<ForgetPage> {
        );
   }
 
-  Widget createMyInput(iconString,placeholder,isPassword) {
-
-    return Container(
-      padding: EdgeInsets.fromLTRB(15.0,5,15.0,5),
-      child: Row(
-        children: <Widget>[
-          Image.asset(iconString,width: 25,color:Color(0xff2D4ED1)),
-          Expanded(
-            child: Container(
-              margin: EdgeInsets.only(left: 15),
-                decoration:BoxDecoration(
-                  border:Border(bottom: BorderSide(width: 0.8,color: Color(0xff2D4ED1))), //底部border
-                ),
-              padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-              child: TextField(
-                decoration: InputDecoration(
-                  hintText: placeholder,
-                  contentPadding: EdgeInsets.fromLTRB(0, 17, 15, 15), //输入框内容部分设置padding，跳转跟icon的对其位置
-                  border:InputBorder.none,
-                ),
-                obscureText: isPassword, //是否是以星号*显示密码
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
 }

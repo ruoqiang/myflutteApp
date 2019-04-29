@@ -1,6 +1,8 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:myflutterapp/pages/details_page.dart';
+import 'package:myflutterapp/pages/home.dart';
+import 'package:myflutterapp/pages/index_page.dart';
 import 'package:myflutterapp/pages/login.dart';
 import 'package:myflutterapp/pages/register.dart';
 import '../routers/application.dart';
@@ -20,7 +22,7 @@ class _LoginState extends State<LoginPage> {
   var tipsText = '';
   var isOpen = false;
   var pressAttention = false;
-  
+  // var _prefs =  SharedPreferences.getInstance();
   //手机号的控制器
   TextEditingController phoneController = TextEditingController();
   //密码的控制器
@@ -41,7 +43,42 @@ class _LoginState extends State<LoginPage> {
       });
     }
   }
-
+   //设置本地持久化数据
+  setValueToLocal() async{
+    SharedPreferences  _prefs =  await SharedPreferences.getInstance();
+    _prefs.setString('mobile',phoneController.text);
+  }
+  void _mylogin() async{
+    print({'手机号': phoneController, '密码': passwordController.text});
+    if(phoneController.text == ''){
+      showToast("请输入手机号码");
+      return;
+    }
+     if(passwordController.text == ''){
+      showToast("请输入密码");
+      return;
+    }
+    var params = {
+      'data': {
+        'Identifier': phoneController.text,
+        'Credential': passwordController.text
+      },
+      'token': 11111
+    };
+    SharedPreferences _prefs =  await SharedPreferences.getInstance();
+    await post('Login/UserLogin',formData:params).then((val){
+       print('dddddd：>>>>>>>>>>>>>-----------------------------------$val');
+      showToast('登录成功');
+      _prefs.setString('token',val['result']['Token']);
+      _prefs.setString('mobile',phoneController.text);
+       Navigator.push(
+         context,
+         MaterialPageRoute(builder: (context) {
+           return IndexPage();
+         }),
+       );
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -111,13 +148,20 @@ class _LoginState extends State<LoginPage> {
                       InkWell(child: Text('忘记密码？',style: TextStyle(color: Color(0xff2D4ED1)),),onTap: (){
                         Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => ForgetPage()),
+                              MaterialPageRoute(builder: (context) {
+                                setValueToLocal();
+                                return ForgetPage();
+                              } ),
                             );
                       },),
                       InkWell(child: Text('立即注册',style: TextStyle(color: Color(0xffECB81C)),),onTap: (){
                         Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => RegisterPage()),
+                              MaterialPageRoute(builder: (context) {
+                                print('我要去注册页面了');
+                                setValueToLocal();
+                                return RegisterPage();
+                              } ),
                             );
                       },)
                     ],
@@ -129,63 +173,7 @@ class _LoginState extends State<LoginPage> {
           ),
         ),
        );
-  
-    
   }
- void _mylogin() async{
-    
-    print({'手机号': phoneController, '密码': passwordController.text});
-    if(phoneController.text == ''){
-      showToast("请输入手机号码");
-      return;
-    }
-     if(passwordController.text == ''){
-      showToast("请输入密码");
-      return;
-    }
-    var params = {
-      'data': {
-        'Identifier': phoneController.text,
-        'Credential': passwordController.text
-      },
-      'token': 11111
-    };
-    SharedPreferences _prefs =  await SharedPreferences.getInstance();
-    await post('Login/UserLogin',formData:params).then((val){
-      print('dddddd：>>>>>>>>>>>>>-----------------------------------$val');
-      _prefs.setString('mobile',phoneController.text);
-    });
-  }
-
-  // Widget createMyInput(iconString,placeholder,isPassword,myController) {
-
-  //   return Container(
-  //     padding: EdgeInsets.fromLTRB(15.0,5,15.0,5),
-  //     child: Row(
-  //       children: <Widget>[
-  //         Image.asset(iconString,width: 25,color:Color(0xff2D4ED1)),
-  //         Expanded(
-  //           child: Container(
-  //             margin: EdgeInsets.only(left: 15),
-  //               decoration:BoxDecoration(
-  //                 border:Border(bottom: BorderSide(width: 0.8,color: Color(0xff2D4ED1))), //底部border
-  //               ),
-  //             padding: EdgeInsets.fromLTRB(0, 0, 5, 0),
-  //             child: TextField(
-  //               controller: myController,
-  //               decoration: InputDecoration(
-  //                 hintText: placeholder,
-  //                 contentPadding: EdgeInsets.fromLTRB(0, 17, 15, 15), //输入框内容部分设置padding，跳转跟icon的对其位置
-  //                 border:InputBorder.none,
-  //               ),
-  //               obscureText: isPassword, //是否是以星号*显示密码
-  //             ),
-  //           ),
-  //         )
-  //       ],
-  //     ),
-  //   );
-  // }
 
   Widget _logo() {
     return Container(
@@ -209,7 +197,6 @@ class _LoginState extends State<LoginPage> {
     );
   }
 
-  
 
 }
 

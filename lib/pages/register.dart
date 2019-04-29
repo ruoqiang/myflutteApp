@@ -5,6 +5,7 @@ import 'package:myflutterapp/base_widgit/create_my_input.dart';
 import 'package:myflutterapp/base_widgit/showToast.dart';
 import 'package:myflutterapp/common/http.dart';
 import 'package:myflutterapp/pages/details_page.dart';
+import 'package:myflutterapp/pages/index_page.dart';
 import 'package:myflutterapp/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../routers/application.dart';
@@ -122,6 +123,13 @@ void _register() async{
       _prefs.setString('token',val['result']['Token']);
       _prefs.setString('mobile',phoneController.text);
       //跳转逻辑跟登录一样。。先省略
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return IndexPage();
+        }),
+      );
     });
   }
 

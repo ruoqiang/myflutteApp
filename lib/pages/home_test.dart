@@ -5,7 +5,11 @@ import 'dart:async';
 import 'dart:convert';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:myflutterapp/common/http.dart';
+import 'package:myflutterapp/pages/login.dart';
+import 'package:myflutterapp/pages/search.dart';
 import 'package:myflutterapp/pages/user_base_info.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 //import './search.dart';
 class HomeTestPage extends StatefulWidget {
   @override
@@ -35,13 +39,13 @@ class _HomeTestPageState extends State<HomeTestPage> {
   Widget build(BuildContext context) {
     
     return Scaffold(
-      appBar: AppBar(title: Text('My testhPage')),
+      appBar: AppBar(title: Text('My testhPage2')),
       body:Container(
           child:SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                navigatorList.length >0 ?TopNavigator(navigatorList: navigatorList) :new Text(''),
-                TopNavigatorlist(navigatorList: navigatorList),
+                // navigatorList.length >0 ?TopNavigator(navigatorList: navigatorList) :new Text(''),
+                // TopNavigatorlist(navigatorList: navigatorList),
                 slideList.length >0 ?SlideList(slideList: slideList,):new Text(''),
                 new Text('ddd'),
                 new Text('ddddsswed'),
@@ -52,10 +56,11 @@ class _HomeTestPageState extends State<HomeTestPage> {
                 new Text('ddddsswed'),
                 new Text('ddddsswed'),
                 RaisedButton(child: Text('跳转到个人信息',style: TextStyle(color: Colors.deepPurple),),onPressed: () {
-                  Navigator.push(
-                    context,
-                    new MaterialPageRoute(builder: (context) => new UserBaseInfoPage()),
-                  );
+                  checkToken();
+                  // Navigator.push(
+                  //   context,
+                  //   new MaterialPageRoute(builder: (context) => new UserBaseInfoPage()),
+                  // );
                 },),
               ],
             ),
@@ -83,7 +88,37 @@ class _HomeTestPageState extends State<HomeTestPage> {
       return print(e);
     }
   }
+//Main/MainQuest
 
+ void checkToken() async {
+   SharedPreferences  _prefs =  await SharedPreferences.getInstance();
+   var token = _prefs.getString('token');
+   var params = {
+      'token': token
+    };
+    
+    await post('Main/MainQuest',formData:params).then((val){
+       print('dddddd：>>>>>>>>>>>>>-----------------------------------$val');
+      // showToast('登录成功');
+      // _prefs.setString('token',val['result']['Token']);
+      // _prefs.setString('mobile',phoneController.text);
+      if(val['issuccess'] ==false) {
+        Navigator.push(
+         context,
+         MaterialPageRoute(builder: (context) {
+           return LoginPage();
+         }),
+       );
+      } else if(val['issuccess'] ==true) {
+        Navigator.push(
+         context,
+         MaterialPageRoute(builder: (context) {
+           return SearchPage();
+         }),
+       );
+      }
+    });
+ }
 
 }
 // 导航组件

@@ -14,7 +14,7 @@ class ForgetPage extends StatefulWidget {
 
 class _ForgetState extends State<ForgetPage> {
   var tipsText = '';
-  var isOpen = false;
+  var isOpen = true;
   var pressAttention = false;
 //手机号的控制器
   TextEditingController phoneController = TextEditingController();
@@ -79,7 +79,7 @@ class _ForgetState extends State<ForgetPage> {
                 ),
                 Stack(
                   children: <Widget>[
-                    CreateMyInput(iconString:'images/login_icon_code.png',placeholder:"请输入验证码",isPassword:false,inputController:passwordController),
+                    CreateMyInput(iconString:'images/login_register_icon_verification.png',placeholder:"请输入验证码",isPassword:false,inputController:passwordController),
                     Positioned(
                       top:3,
                       right: 20,

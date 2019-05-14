@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 class MyAppBar extends StatelessWidget  {
   final String title;
   final bool isHasBackBtn;
-  MyAppBar({this.title,this.isHasBackBtn});
+  final icon;
+  MyAppBar({this.title,this.isHasBackBtn=true,this.icon});
   Widget build(BuildContext context) {
     return SafeArea(
         child:Container(
@@ -25,7 +26,7 @@ class MyAppBar extends StatelessWidget  {
                   child: Container(
                     width: 55,
                     height: 51,
-                    child: isHasBackBtn?Icon(Icons.arrow_back,color:Colors.white,) : null,
+                    child: isHasBackBtn?Icon(icon??Icons.arrow_back,color:Colors.white,) : null,
                   ),
                 ),
               )

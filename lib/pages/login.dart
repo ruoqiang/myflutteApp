@@ -20,7 +20,7 @@ class LoginPage extends StatefulWidget {
 
 class _LoginState extends State<LoginPage> {
   var tipsText = '';
-  var isOpen = false;
+  var isOpen = true;
   var pressAttention = false;
   // var _prefs =  SharedPreferences.getInstance();
   //手机号的控制器
@@ -67,11 +67,11 @@ class _LoginState extends State<LoginPage> {
     };
     SharedPreferences _prefs =  await SharedPreferences.getInstance();
     await post('Login/UserLogin',formData:params).then((val){
-       print('dddddd：>>>>>>>>>>>>>-----------------------------------$val');
+      //  print('dddddd：>>>>>>>>>>>>>-----------------------------------$val');
       showToast('登录成功');
       _prefs.setString('token',val['result']['Token']);
       _prefs.setString('mobile',phoneController.text);
-       Navigator.push(
+       Navigator.pushReplacement(
          context,
          MaterialPageRoute(builder: (context) {
            return IndexPage();
@@ -89,7 +89,7 @@ class _LoginState extends State<LoginPage> {
           child: SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                MyAppBar(title:'登录',isHasBackBtn:true),
+                MyAppBar(title:'登录',isHasBackBtn:false),
                 _logo(),
                 CreateMyInput(iconString:'images/login_icon_phone.png',placeholder:"请输入手机号",isPassword:false,inputController:phoneController),
                 Stack(

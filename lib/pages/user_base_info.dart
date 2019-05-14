@@ -9,7 +9,7 @@ class _UserBaseInfoState extends State<UserBaseInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('My searchPage')),
+      appBar: AppBar(title: Text('UserBaseInfoPage')),
       body: Center(
         child: FlatButton(
           child: Text('POP-返回'),

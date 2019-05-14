@@ -62,7 +62,7 @@ class _IndexPageState extends State<IndexPage> {
            ),
          ];
 
-    final pageList = [HomeTestPage(),SearchPage(),ShopCart(),UserCenterPage()];
+    final pageList = [HomePage(),SearchPage(),ShopCart(),UserCenterPage()];
     @override
     Widget build(BuildContext context) {
 //      setState(() {

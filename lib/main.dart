@@ -2,19 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:myflutterapp/pages/index_page.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:fluro/fluro.dart';
+
 import './routers/routes.dart';
 import './routers/application.dart';
 import 'package:myflutterapp/pages/login.dart';
 import 'package:provide/provide.dart';
+import 'provide/currentMenuIndex.dart';
 import 'provide/count.dart';
 import 'dart:io';
 import 'package:flutter/services.dart';
 void main() {
   //全局注册provide状态
   var counter =Counter();
+  var currentMenuIndex  =CurrentMenuIndexProvide();
   var providers  =Providers();
   providers
-    ..provide(Provider<Counter>.value(counter));
+    ..provide(Provider<Counter>.value(counter))
+    ..provide(Provider<CurrentMenuIndexProvide>.value(currentMenuIndex));
   runApp(ProviderNode(child: MyApp(), providers: providers));
   if (Platform.isAndroid) {
 // 以下两行 设置android状态栏为透明的沉浸。写在组件渲染之后，是为了在渲染后进行set赋值，覆盖状态栏，写在渲染之前MaterialApp组件会覆盖掉这个值。

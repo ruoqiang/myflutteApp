@@ -3,6 +3,7 @@ import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:myflutterapp/base_widgit/create_my_input.dart';
 import 'package:myflutterapp/base_widgit/showToast.dart';
+import 'package:myflutterapp/base_widgit/webview.dart';
 import 'package:myflutterapp/common/http.dart';
 import 'package:myflutterapp/pages/details_page.dart';
 import 'package:myflutterapp/pages/index_page.dart';
@@ -18,7 +19,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterState extends State<RegisterPage> {
   var tipsText = '';
-  var isOpen = false;
+  var isOpen = true;
   var pressAttention = false;
 
   Timer _timer;
@@ -195,7 +196,7 @@ void _register() async{
               Stack(
                 children: <Widget>[
                   CreateMyInput(
-                      iconString: 'images/login_icon_code.png',
+                      iconString: 'images/login_register_icon_verification.png',
                       placeholder: "请输入验证码",
                       isPassword: false,
                       inputController: codeController),
@@ -259,9 +260,20 @@ void _register() async{
                                 child: InkWell(
                                   onTap: () {
 //                                      Application.router.navigateTo(context,"/detail?id=3",transition: TransitionType.inFromRight);
-                                    Application.router.navigateTo(
-                                        context, "/shop_cart",
-                                        transition: TransitionType.inFromRight);
+                                    // Application.router.navigateTo(
+                                    //     context, "/shop_cart",
+                                    //     transition: TransitionType.inFromRight);
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) {
+                                        // var model = item[index];
+                                        return WebView(
+                                            statusBarColor: '4c5bca',
+                                            url: 'http://wechat.chepass.com:8021/Content/dist/#/useAgreementRegister?backDoor',
+                                            title: '注册协议',
+                                            hideAppBar: false);
+                                      }),
+                                    );
                                   },
                                   child: Text(
                                     '注册协议',

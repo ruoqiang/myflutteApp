@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:myflutterapp/base_widgit/appbar.dart';
+import 'package:myflutterapp/base_widgit/fixedAppbar.dart';
 import 'package:myflutterapp/base_widgit/showToast.dart';
 import 'package:myflutterapp/base_widgit/webview.dart';
 import 'dart:io';
@@ -150,14 +151,7 @@ class _ProcessPageState extends State<ProcessPage> {
         bottom: 0,
         child: PopupContent(
           content: Scaffold(
-            appBar: AppBar(
-              // Here we take the value from the MyHomePage object that was created by
-              // the App.build method, and use it to set our appbar title.
-              title: Text(title,style: TextStyle(color: Colors.white),),
-              backgroundColor:  Color(0xff2D4ED1),
-                iconTheme: IconThemeData(color: Colors.white),
-                centerTitle:true,
-            ),
+            appBar: fixedAppbar(title),
             body: SingleChildScrollView(
               child: Column(
                 children: <Widget>[

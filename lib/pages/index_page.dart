@@ -70,7 +70,7 @@ class _IndexPageState extends State<IndexPage> {
 //      });
      return Scaffold(
 //       appBar: AppBar(title: Text('百姓生活+',style: TextStyle(color:Color(0xffffffff)),)),
-       backgroundColor: Color(0xfff2f2f2),
+       backgroundColor: Color(0xffeff0f4),
        bottomNavigationBar: BottomNavigationBar(
           items: bootomTabList,
           type: BottomNavigationBarType.fixed,

@@ -74,8 +74,12 @@ flutter:
    - images/index_apply_banner.png
    - images/index_apply_btn.png
    - images/index_apply_img_discount.png
-   
-   
+
+   - images/index_apply_icon_choose_blue.png
+   - images/index_apply_icon_choose.png
+   - images/index_apply_icon_choose_gray.png
+
+
   #  - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

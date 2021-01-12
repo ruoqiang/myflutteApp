@@ -6,14 +6,14 @@ import 'package:myflutterapp/base_widgit/showToast.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'index_page.dart';
-class SearchGoodsDetailPage extends StatefulWidget {
+class PublishGoodsDetailPage extends StatefulWidget {
   final id;
-  SearchGoodsDetailPage({this.id});
+  PublishGoodsDetailPage({this.id});
 
   @override
-  _SearchGoodsDetailPageState createState() => _SearchGoodsDetailPageState();
+  _PublishGoodsDetailPageState createState() => _PublishGoodsDetailPageState();
 }
-class _SearchGoodsDetailPageState extends State<SearchGoodsDetailPage> {
+class _PublishGoodsDetailPageState extends State<PublishGoodsDetailPage> {
 
   final List<Map> listDescs1 = [{'label':'货物类型:','value':'设备、牛奶'},{'label':'重量:','value':'10吨'},{'label':'体积:','value':'10立方'},{'label':'装货时间:','value':'2010-02-20'}];
   final List<Map> listDescs2 = [{'label':'车辆类型:','value':'零担 6.2米 厢式 10吨'},{'label':'重量:','value':'10吨'},{'label':'特殊要求:','value':'冷链'}];

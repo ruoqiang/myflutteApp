@@ -2,73 +2,50 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:myflutterapp/base_widgit/fixedAppbar.dart';
 import 'package:myflutterapp/base_widgit/nextButton.dart';
-import 'package:myflutterapp/base_widgit/showToast.dart';
-import 'package:myflutterapp/common/http.dart';
-import 'package:myflutterapp/pages/index_page.dart';
-import 'package:myflutterapp/pages/my_page.dart';
-import 'package:myflutterapp/pages/user_carinfo.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
-import 'car_list.dart';
-import 'certification.dart';
-import 'login.dart';
+import 'package:flutter_my_picker/flutter_my_picker.dart';
+import 'package:flutter_my_picker/common/date.dart';
 
 
-
-class TestSelectDatePage extends StatefulWidget {
+class TestSelectDate2Page extends StatefulWidget {
   @override
-  _TestSelectDatePageState createState() => _TestSelectDatePageState();
+  _TestSelectDate2PageState createState() => _TestSelectDate2PageState();
 }
 
-class _TestSelectDatePageState extends State<TestSelectDatePage> {
+class _TestSelectDate2PageState extends State<TestSelectDate2Page> {
 
-  var date = '';
-  var time = '';
+
+  DateTime date;
+  String dateStr;
   @override
  initState()  {
     super.initState();
+    DateTime _date = new DateTime.now();
+    print(MyDate.format('yyyy-MM-dd HH:mm:ss', _date));
+    setState(() {
+      date = _date;
+      dateStr = MyDate.format('yyyy-MM-dd HH:mm:ss', _date);
+    });
   }
-  clear() async{
-   SharedPreferences _prefs =  await SharedPreferences.getInstance();
 
-   _prefs.setBool('isLogin', false);
-   _prefs.setBool('isCertified', false);
-   Navigator.pushAndRemoveUntil(
-     context,
-     MaterialPageRoute(builder: (context) {
-     return IndexPage();
-     }),(check) => false
-   );
+  _change(formatString) {
+    return (_date) {
+      setState(() {
+        date = _date;
+        dateStr = MyDate.format(formatString, _date);
+      });
+    };
+  }
 
- }
-  SelectDate() async {
-    var result = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2010),
-      lastDate: DateTime(2025),
-      initialDatePickerMode: DatePickerMode.year,
-    );
-    var timeSelect = await SelectTime();
-    var hour = timeSelect.hour;
-    var minute = timeSelect.minute;
-    print('period-------------------${result}');
-    return result;
-  }
-  SelectTime () async{
-    var result = await showTimePicker(context: context, initialTime: TimeOfDay.now());
-    result.toString();
-    print('result-------------------${result.hourOfPeriod}'); //hourOfPeriod 12小时制的小时  in 12 hour format
-    print('minute-------------------${result.minute}');
-    print('hour-------------------${result.hour}'); //hour 24小时制的小时
-    print('period-------------------${result.period}'); //period am 还是pm
-//    if(result != null) {
-////      setState(() {
-////        time = (result.hourOfPeriod).toString();
-////      });
-//    }
-    return time;
-  }
+showPicker() {
+    print('showPicker---------------------------');
+  MyPicker.showPicker(
+    context: context,
+    current: date,
+    mode: MyPickerMode.date,
+    onChange: _change('yyyy-MM-dd'),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
 
@@ -77,16 +54,29 @@ class _TestSelectDatePageState extends State<TestSelectDatePage> {
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-
-            NextButton(text: '选择日期',ButtonClick: SelectDate),
-            NextButton(text: '选择时间',ButtonClick: SelectTime),
+            NextButton(text: '选择日期',ButtonClick: showPicker),
             Container(
               width: 200,
               height: 80,
               color: Colors.green,
-              child: Text(date),
+              child: Text(date.toString()),
             ),
-            Text(time),
+            NextButton(text:'日期时间选择器',ButtonClick: () {
+              MyPicker.showDateTimePicker(
+                context: context,
+//                background: Colors.black,
+//                color: Colors.white,
+                current: date,
+                magnification: 1.2,
+                squeeze: 1.45,
+                offAxisFraction: 0.2,
+                onChange: _change('yyyy-MM-dd HH:mm'),
+              );
+            }),
+            Text(
+              '当前时间： ${dateStr ?? MyDate.format('yyyy-MM-dd HH:mm:ss', date)}',
+              textAlign: TextAlign.center,
+            ),
           ],
         ),
       ),

@@ -15,14 +15,15 @@ import 'login.dart';
 
 
 
-class SettingPage extends StatefulWidget {
+class TestSelectDatePage extends StatefulWidget {
   @override
-  _SettingPageState createState() => _SettingPageState();
+  _TestSelectDatePageState createState() => _TestSelectDatePageState();
 }
 
-class _SettingPageState extends State<SettingPage> {
+class _TestSelectDatePageState extends State<TestSelectDatePage> {
 
-
+  var date = '';
+  var time = '';
   @override
  initState()  {
     super.initState();
@@ -40,16 +41,52 @@ class _SettingPageState extends State<SettingPage> {
    );
 
  }
+  SelectDate() async {
+    var result = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2010),
+      lastDate: DateTime(2025),
+      initialDatePickerMode: DatePickerMode.year,
+    );
+    var timeSelect = await SelectTime();
+    var hour = timeSelect.hour;
+    var minute = timeSelect.minute;
+    print('period-------------------${result}');
+    return result;
+  }
+  SelectTime () async{
+    var result = await showTimePicker(context: context, initialTime: TimeOfDay.now());
+    result.toString();
+    print('result-------------------${result.hourOfPeriod}'); //hourOfPeriod 12小时制的小时  in 12 hour format
+    print('minute-------------------${result.minute}');
+    print('hour-------------------${result.hour}'); //hour 24小时制的小时
+    print('period-------------------${result.period}'); //period am 还是pm
+//    if(result != null) {
+////      setState(() {
+////        time = (result.hourOfPeriod).toString();
+////      });
+//    }
+    return time;
+  }
   @override
   Widget build(BuildContext context) {
 
     return Scaffold(
-      appBar: fixedAppbar(title:'我的'),
+      appBar: fixedAppbar(title:'选择日期'),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
 
-            NextButton(text: '退出登录',ButtonClick: clear,)
+            NextButton(text: '选择日期',ButtonClick: SelectDate),
+            NextButton(text: '选择时间',ButtonClick: SelectTime),
+            Container(
+              width: 200,
+              height: 80,
+              color: Colors.green,
+              child: Text(date),
+            ),
+            Text(time),
           ],
         ),
       ),

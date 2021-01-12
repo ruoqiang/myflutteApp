@@ -6,30 +6,68 @@ import 'package:myflutterapp/common/http.dart';
 import 'package:myflutterapp/pages/user_carinfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'add_car_base_info.dart';
 
 
-class MyPage extends StatefulWidget {
+
+class CarListPage extends StatefulWidget {
   @override
-  _MyPageState createState() => _MyPageState();
+  _CarListPageState createState() => _CarListPageState();
 }
 
-class _MyPageState extends State<MyPage> {
+class _CarListPageState extends State<CarListPage> {
 
   final List<Map> lists = [
-    {'label':'我的车库:','icon':'images/icon-car.png','index':0},
-    {'label':'分享:','icon':'images/icon-share.png','index':1},
-    {'label':'客服:','icon':'images/question.png','index':2},
-    {'label':'设置:','icon':'images/setting.png','index':3}];
+    {'carNum':'沪B12345:','desc':'长度：6.5米   载重：5000吨   容积：20立方米','index':0},
+    {'carNum':'沪AQ2375:','desc':'长度：4.5米   载重：3000吨   容积：10立方米','index':1},
+    {'carNum':'粤AQ2375:','desc':'长度：5.5米   载重：4000吨   容积：15立方米','index':2},
+    {'carNum':'苏AQ2375:','desc':'长度：8.5米   载重：7000吨   容积：30立方米','index':3}];
+
+  _addCar() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return AddCarBaseInfoPage();
+      }),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: fixedAppbar(title:'我的'),
+      appBar: fixedAppbar(title:'我的车库'),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            cardinfo(),
-            BottomListBox(lists)
+            BottomListBox(lists),
+            Container(
+                padding: EdgeInsets.all(15),
+                margin: EdgeInsets.only(top: 20,bottom: 30),
+                child: Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Container(
+                        height: 40,
+                        child: RaisedButton(
+//                                disabledTextColor:Color(0xff2D4ED1),
+//                                highlightColor:Color(0xff2D4ED1), //Color(0xff2D4ED1),
+                          splashColor:Color(0xff2D4ED1),
+                          color: Color(0xff2D4ED1),
+                          onPressed: (){
+                            _addCar();
+                            // setState(() => pressAttention = !pressAttention);
+                          },
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(3)
+                          ),
+                          textColor:  Colors.white ,//pressAttention ? Colors.white : Color(0xff2D4ED1),
+                          child: Text("添加车辆"),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+            ),
           ],
         ),
       ),
@@ -39,12 +77,12 @@ class _MyPageState extends State<MyPage> {
   Widget BottomListBox (BottomListBox){
     return Container(
 //      color: Colors.white,
-      margin: EdgeInsets.only(top: 15),
+      margin: EdgeInsets.only(top: 10),
       decoration: BoxDecoration(
         color: Colors.white
       ),
       child: Column(
-        children: createdList(BottomListBox),
+        children: createdList(lists),
       ),
     );
   }
@@ -77,53 +115,29 @@ class _MyPageState extends State<MyPage> {
           children: [
             Row(
               children: [
-                Image.asset(item['icon'],width: ScreenUtil().setWidth(46), height:ScreenUtil().setWidth(46)),
-                Container(child: Text(item['label']),margin: EdgeInsets.only(left: 8),)
+                Image.asset('images/img01.png',width: ScreenUtil().setWidth(100), height:ScreenUtil().setWidth(100)),
+                Container(
+//                  color: Colors.pink,
+                    width: ScreenUtil().setWidth(540),
+                    margin: EdgeInsets.only(left: 8),
+//                    color: Colors.pink,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item['carNum']),
+                        Text('长度：6.5米  载重：5000吨  容积：20立方米 ',),
+                      ],
+                    )
+                )
               ],
             ),
-            Positioned(child: Icon(Icons.keyboard_arrow_right),right: 0,)
+            Positioned(child: Icon(Icons.keyboard_arrow_right),right: 0,top:14)
           ],
         )
       )
     );
   }
 
-  Widget cardinfo() {
-    return Container(
-      child: Stack(
-        children: [
-          Opacity(opacity: 0.5,child: Image.asset('images/login_bg4.png',width: ScreenUtil().setWidth(750), height:ScreenUtil().setWidth(500),fit: BoxFit.fill),),
-          Positioned(
-            right: 50,
-            top: 20,
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(ScreenUtil().setWidth(71)),
-              child: Image.asset('images/user_img02.png',width: ScreenUtil().setWidth(140), height:ScreenUtil().setWidth(140)),
-            ),
-          ),
-          Positioned(
-            left: 20,
-            top: 40,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              children: [
-                Text('已认证',style: TextStyle(fontSize: 20),),
-                Container(child: Text('18226796732',style: TextStyle(fontSize: 16)),margin: EdgeInsets.only(left: 5),)],
-            ),
-          ),
-          Positioned(
-            left: 20,
-            top: 90,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              children: [
-                Text('账户余额',style: TextStyle(fontSize: 20),),
-                Container(child: Text('10000,00',style: TextStyle(fontSize: 20)),margin: EdgeInsets.only(left: 5),)],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
 }
+
+

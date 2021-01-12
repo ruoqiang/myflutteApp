@@ -6,24 +6,19 @@ import 'package:image_picker/image_picker.dart';
 import 'package:myflutterapp/base_widgit/fixedAppbar.dart';
 import 'package:myflutterapp/base_widgit/showToast.dart';
 import 'package:myflutterapp/common/http.dart';
+import 'package:myflutterapp/pages/index_page.dart';
+import 'package:myflutterapp/pages/my_page.dart';
 import 'package:myflutterapp/pages/user_carinfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../base_widgit/nextButton.dart';
 
 
-class AddCarOtherInfoPage extends StatefulWidget {
+class CertificationPage extends StatefulWidget {
   @override
-  _AddCarOtherInfoState createState() => _AddCarOtherInfoState();
+  _CertificationPageState createState() => _CertificationPageState();
 }
 
-class _AddCarOtherInfoState extends State<AddCarOtherInfoPage> {
-  var _inputController;
-
-//  var _nameController;
-//  var _idNumberController;
-//  var _mobileController;
-//  var _inviteController;
-
+class _CertificationPageState extends State<CertificationPage> {
   //输入框控制器
   TextEditingController _nameController = TextEditingController();
   TextEditingController _idNumberController = TextEditingController();
@@ -38,12 +33,31 @@ class _AddCarOtherInfoState extends State<AddCarOtherInfoPage> {
   RegExp mobileExp = RegExp(
       r'^((13[0-9])|(14[0-9])|(15[0-9])|(16[0-9])|(17[0-9])|(18[0-9])|(19[0-9]))\d{8}$');
 
-  goToNextPage2() {
-    Navigator.push(
+  TextEditingController _usernameController = TextEditingController();
+  TextEditingController _cardNumController = TextEditingController();
+
+  File _uploadImage1;
+  File _uploadImage2;
+  final picker = ImagePicker();
+
+
+  goToNextPage2() async {
+    if (_uploadImage1== null) {
+      return showToast("请上身份证正面照片");
+    }
+//    if (_usernameController.text == '') {
+//      return showToast("请输入姓名");
+//    }
+//    if (_cardNumController.text == '') {
+//      return showToast("请输入身份证号");
+//    }
+    SharedPreferences _prefs =  await SharedPreferences.getInstance();
+    _prefs.setBool('isCertified',true);
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) {
-        return UserCarInfoPage();
-      }),
+        return IndexPage();
+      }),(check) => false
     );
   }
 
@@ -53,19 +67,6 @@ class _AddCarOtherInfoState extends State<AddCarOtherInfoPage> {
       showToast("请输入姓名");
       return;
     }
-//    if(_idNumberController.text == ''){
-//      showToast("请输入身份证号");
-//      return;
-//    }
-//    if(_mobileController.text == ''){
-//      showToast("请输入手机号码");
-//      return;
-//    }
-//    if(mobileExp.hasMatch(_mobileController.text)==false) {
-//      showToast('请输入正确格式的手机号码');
-//      return;
-//    }
-
 
     SharedPreferences _prefs = await SharedPreferences.getInstance();
     var token = _prefs.getString('token');
@@ -100,10 +101,6 @@ class _AddCarOtherInfoState extends State<AddCarOtherInfoPage> {
     });
   }
 
-  File _uploadImage1;
-  File _uploadImage2;
-  final picker = ImagePicker();
-
   /// *
   /// isTakePhoto:是否为拍照
   /// selectedIndex列表显示图片的索引
@@ -132,83 +129,19 @@ class _AddCarOtherInfoState extends State<AddCarOtherInfoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: fixedAppbar(title: '车辆基础信息'),
+      appBar: fixedAppbar(title: '用户信息认证'),
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
-            _headeText(),
-            _headeLine(),
+            _formCarImgList(),
             _formcarBaseInfoBox(),
-            NextButton(text: '提交', ButtonClick: goToNextPage)
+            NextButton(text: '提交', ButtonClick: goToNextPage2)
           ],
         ),
       ),
     );
   }
 
-  Widget _headeText() {
-    return Container(
-      margin: EdgeInsets.only(top: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text('车辆基础信息',),
-          Container(
-            margin: EdgeInsets.only(left: 82, right: 2),
-            child: Text('车辆其他信息',style: TextStyle(color: Color(0xff2D4ED1), fontSize: 14),),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _headeLine() {
-    return Container(
-      margin: EdgeInsets.only(top: 20, bottom: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              width: 20,
-              height: 20,
-              color: Colors.black12,
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(left: 2, right: 2),
-            decoration: BoxDecoration(
-              border: Border(
-                top: BorderSide(width: 1.0, color: Colors.black12),
-              ),
-            ),
-            width: 140,
-            height: 0,
-            child: Text('', textAlign: TextAlign.center),
-          ),
-          Image.asset('images/index_apply_icon_choose_blue.png', width: 20,),
-
-        ],
-      ),
-    );
-  }
-
-  Widget _formBox() {
-    return Container(
-      color: Colors.white,
-      child: Column(
-        children: <Widget>[
-          _formList(Text('其他信息')),
-          _formList(_labelAndInput('车牌颜色', '请输入车牌颜色', _nameController)),
-          _formList(_labelAndInput('车牌号', '请输入车牌号', _nameController)),
-          _formList(_labelAndInput('发动机号', '请输入发动机号', _nameController)),
-          _formList(_labelAndInput('车辆识别代码', '请输入车辆识别代码', _nameController)),
-//          _formList(_labelAndInputYzm('验证码','请输入验证码',_inputController)),
-        ],
-      ),
-    );
-  }
 
   Widget _formcarBaseInfoBox() {
     return Container(
@@ -217,20 +150,85 @@ class _AddCarOtherInfoState extends State<AddCarOtherInfoPage> {
       child: Column(
         children: <Widget>[
           _formList(Text(
-            '其他信息', style: TextStyle(fontSize: ScreenUtil().setSp(32)),)),
-          _formList(_labelAndInput('载货长度（车身长度）:', '请输入车牌颜色', _nameController)),
-          _formList(_labelAndInput('其他长度:', '请输入其他长度', _nameController)),
-          _formList(_labelAndInput('车辆类型:', '请输入车辆类型', _nameController)),
-          _formList(_labelAndInput('货运类型:', '请输入货运类型', _nameController)),
-          _formList(_labelAndInput('载重:', '请输入载重', _nameController)),
-          _formList(_labelAndInput('容积:', '请输入载重', _nameController)),
-          
+            '申请人信息', style: TextStyle(fontSize: ScreenUtil().setSp(32)),)),
+          _formList(_labelAndInput('姓名:', '请输入姓名', _usernameController)),
+          _formList(_labelAndInput('身份证号:', '请输入身份证号', _cardNumController))
         ],
       ),
     );
   }
 
+  Widget _formCarImgList() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 15),
+      color: Colors.white,
+      child: Column(
+        children: <Widget>[
+          _formList(Text(
+            '用户身份证照片信息', style: TextStyle(fontSize: ScreenUtil().setSp(32)),)),
+          _carImgList()
+        ],
+      ),
+    );
+  }
 
+  Widget _carImgList() {
+    return Container(
+      color: Color(0xffffffff),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          GestureDetector(
+            onTap: () {
+              _pickImage(0);
+            },
+            child: Container(
+              margin: EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: [
+                  _uploadImage1 ==null ?
+                  Image.asset('images/car_info_defaul01.png', height: 140,
+                    width: 140,): Container(
+                    decoration:BoxDecoration(
+                      border:Border.all(color: Colors.black12,width: 1), //底部border
+                    ),
+                    child: Image.file(_uploadImage1, height: 140,width: 140,),
+                  ),
+                  Container(
+                    child: Text('上传身份证正页照'), margin: EdgeInsets.only(top: 10),)
+                ],
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: () {
+              //
+              _pickImage(1);
+            },
+            child: Container(
+              margin: EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
+              alignment: Alignment.centerLeft,
+              child: Column(
+                children: [
+                  _uploadImage2 == null ? Image.asset('images/car_info_defaul02.png', height: 140,width: 140,)
+                      :
+                  Container(
+                    decoration:BoxDecoration(
+                      border:Border.all(color: Colors.black12,width: 1), //底部border
+                    ),
+                    child: Image.file(_uploadImage2, height: 140,width: 140,),
+                  ),
+                  Container(
+                    child: Text('上传身份证反页照'), margin: EdgeInsets.only(top: 10),)
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
 
   Widget _formList(widgit) {
     return Container(
@@ -276,6 +274,33 @@ class _AddCarOtherInfoState extends State<AddCarOtherInfoPage> {
     ],
     );
   }
+
+
+
+
+  _pickImage(index) {
+    showModalBottomSheet(
+        context: context,
+        builder: (context) => Container(
+          height: 160,
+          child: Column(
+            children: <Widget>[
+              _item('拍照', true,index),
+              _item('从相册选择', false,index),
+            ],
+          ),
+        ));
+  }
+  _item(String title, bool isTakePhoto,index) {
+    return GestureDetector(
+      child: ListTile(
+        leading: Icon(isTakePhoto ? Icons.camera_alt : Icons.photo_library),
+        title: Text(title),
+        onTap: () => getImage(isTakePhoto,index),
+      ),
+    );
+  }
+
 
 
 //  带验证码，输入框的列

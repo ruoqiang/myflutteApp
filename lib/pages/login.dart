@@ -4,6 +4,7 @@ import 'package:myflutterapp/pages/details_page.dart';
 import 'package:myflutterapp/pages/home.dart';
 import 'package:myflutterapp/pages/index_page.dart';
 import 'package:myflutterapp/pages/login.dart';
+import 'package:myflutterapp/pages/my_page.dart';
 import 'package:myflutterapp/pages/register.dart';
 import '../routers/application.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,7 +14,14 @@ import '../base_widgit/showToast.dart';
 import '../base_widgit/create_my_input.dart';
 import '../common/http.dart';
 
+
+
+
 class LoginPage extends StatefulWidget {
+
+  final pageFrom;
+  LoginPage({Key key, this.pageFrom}) : super(key: key);
+
   @override
   _LoginState createState() => _LoginState();
 }
@@ -25,11 +33,16 @@ class _LoginState extends State<LoginPage> {
   // var _prefs =  SharedPreferences.getInstance();
   //手机号的控制器
   TextEditingController phoneController = TextEditingController();
+
   //密码的控制器
   TextEditingController passwordController = TextEditingController();
 
   @override
   void initState() {
+    print('initState：>>>>>>>>>>>>>--------login---------------------------');
+    print('widget.pageFrom：>>>>>>>>>>>>>--------${widget.pageFrom}---------------------------');
+    phoneController.text = '18226796732';
+    passwordController.text = '123456';
     getValueFromLocalToForm();
     super.initState();
   }
@@ -71,11 +84,16 @@ class _LoginState extends State<LoginPage> {
       showToast('登录成功');
       _prefs.setString('token',val['result']['Token']);
       _prefs.setString('mobile',phoneController.text);
-       Navigator.pushReplacement(
+      _prefs.setBool('isLogin', true);
+      print('mobile：>>>>>>>>>>>>>-----------------------------------${phoneController.text}');
+       Navigator.pushAndRemoveUntil(
          context,
          MaterialPageRoute(builder: (context) {
+//           if(widget.pageFrom =='MyPage') {
+//             return MyPage();
+//           }
            return IndexPage();
-         }),
+         }),(check) => false
        );
     });
   }
@@ -186,11 +204,12 @@ class _LoginState extends State<LoginPage> {
               color: Color(0xff2D4ED1),
               borderRadius: BorderRadius.circular(5)
             ),
-            child: Image.asset('images/login_logo.png',width: 79,),
+            child: Image.asset('images/login_logo.png',width: 72,),
+            padding: EdgeInsets.all(6),
           ),
           Container(
             margin: EdgeInsets.fromLTRB(0,20,0,0),
-            child: Text('易路通达-专注公路物流服务',style: TextStyle(color: Color(0xff2D4ED1),fontSize: 16),),
+            child: Text('老马货运-专注物流服务',style: TextStyle(color: Color(0xff2D4ED1),fontSize: 16),),
           )
         ],
       ),
@@ -199,4 +218,3 @@ class _LoginState extends State<LoginPage> {
 
 
 }
-

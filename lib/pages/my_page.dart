@@ -1,204 +1,292 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/screenutil.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:myflutterapp/base_widgit/fixedAppbar.dart';
-import 'package:url_launcher/url_launcher.dart';
-class SearchGoodsDetailPage extends StatelessWidget {
-  final id;
-  SearchGoodsDetailPage({this.id});
+import 'package:myflutterapp/base_widgit/showToast.dart';
+import 'package:myflutterapp/common/http.dart';
+import 'package:myflutterapp/pages/setting.dart';
+import 'package:myflutterapp/pages/testSelectDate.dart';
+import 'package:myflutterapp/pages/testSelectDate2.dart';
+import 'package:myflutterapp/pages/user_carinfo.dart';
+import 'package:myflutterapp/provide/currentMenuIndex.dart';
+import 'package:provide/provide.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-  final List<Map> listDescs1 = [{'label':'货物类型:','value':'设备、牛奶'},{'label':'重量:','value':'10吨'},{'label':'体积:','value':'10立方'},{'label':'装货时间:','value':'2010-02-20'}];
-  final List<Map> listDescs2 = [{'label':'车辆类型:','value':'零担 6.2米 厢式 10吨'},{'label':'重量:','value':'10吨'},{'label':'特殊要求:','value':'冷链'}];
-  final List<Map> listDescs3 = [{'label':'货到付款','value':''}];
+import 'car_list.dart';
+import 'certification.dart';
+import 'login.dart';
 
-  final List<Map> listDescs4 = [{'label':'货主:','value':'张三'},{'label':'联系电话:','value':'18226796732'}];
-  var pressAttention = false;
 
-  _getOrder() {
-    print('接单');
-//    showToast('接单成功',backgroundColor:Colors.pink,time: 2);
-    //打电话
-    _launchURL();
+
+class MyPage extends StatefulWidget {
+  @override
+  _MyPageState createState() => _MyPageState();
+}
+
+class _MyPageState extends State<MyPage> with AutomaticKeepAliveClientMixin {
+
+  final List<Map> lists = [
+    {'label':'我的车库:','icon':'images/icon-car.png','index':0},
+    {'label':'分享:','icon':'images/icon-share.png','index':1},
+    {'label':'客服:','icon':'images/question.png','index':2},
+    {'label':'设置:','icon':'images/setting.png','index':3}];
+  var isCertified;
+  var isLogin = false;
+  var mobile;
+  var _currentIndex;
+  @override
+ initState()  {
+    // TODO: implement initState
+
+    print('mypage---------------------------------------------执行了');
+    super.initState();
+    getUserInfo();
+
   }
-  //打电话
-  void _launchURL() async {
-    String url = 'tel:'+ '18226796732';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
+ getUserInfo() async{
+   SharedPreferences _prefs =  await SharedPreferences.getInstance();
+    isCertified = _prefs.get('isCertified')??false;
+    isLogin = _prefs.get('isLogin') ?? false;
+    mobile = _prefs.get('mobile');
+   print('isCertified---------------------------------------------$isCertified');
+   setState(() {
+     isCertified = isCertified;
+     isLogin = isLogin;
+     mobile = mobile;
+   });
+
+   print('isLogin-----$isLogin');
+   print('isCertified-----$isCertified');
+   print('mobile-----$mobile');
+ }
+  gotoLogin() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return new LoginPage(pageFrom:'MyPage');
+      }),
+    );
+  }
+  gotoCertified() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return CertificationPage();
+      }),
+    );
+  }
+  gotoTestSelectDatePage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return TestSelectDatePage();
+      }),
+    );
+  }
+  gotoTestSelectDate2Page() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) {
+        return TestSelectDate2Page();
+      }),
+    );
   }
   @override
   Widget build(BuildContext context) {
+    _currentIndex =
+        Provide.value<CurrentMenuIndexProvide>(context).currentIndex;
+    print('mypage---------------------------------------------build--执行了');
     return Scaffold(
-      appBar:  fixedAppbar('货源详情'),
+      appBar: fixedAppbar(title:'我的'),
       body: SingleChildScrollView(
-        child: Container(
-          margin: EdgeInsets.all(ScreenUtil().setWidth(20)),
-          child: SafeArea(
-            child: Column(
-                children: <Widget>[
-                  _adressBox(context),
-                  _detailList(context,'货源信息',listDescs1),
-                  _detailList(context,'所需车辆信息',listDescs2),
-                  _detailList(context,'付款方式',listDescs3),
-                  _detailList(context,'联系方式',listDescs4),
-                  Container(
-                      padding: EdgeInsets.all(15),
-                      margin: EdgeInsets.only(top: 20,bottom: 30),
-                      child: Row(
-                        children: <Widget>[
-                          Expanded(
-                            child: Container(
-                              height: 40,
-                              child: RaisedButton(
-//                                disabledTextColor:Color(0xff2D4ED1),
-//                                highlightColor:Color(0xff2D4ED1), //Color(0xff2D4ED1),
-                                splashColor:Color(0xff2D4ED1),
-                                color: Color(0xff2D4ED1),
-                                onPressed: (){
-                                  _getOrder();
-                                  // setState(() => pressAttention = !pressAttention);
-                                },
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(3)
-                                ),
-                                textColor:  Colors.white ,//pressAttention ? Colors.white : Color(0xff2D4ED1),
-                                child: Text("联系货主"),
-                              ),
-                            ),
-                          ),
-                        ],
-                      )
-                  ),
-                ]
+        child: Column(
+          children: <Widget>[
+            cardinfo(),
+            BottomListBox(lists),
+//            TextButton(onPressed: () {
+//              gotoTestSelectDatePage();
+//            }, child: Text('选择日期')),
+//            Text('$_currentIndex'),
+//            TextButton(onPressed: () {
+//              gotoTestSelectDate2Page();
+//            }, child: Text('选择日期2')),
+
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget BottomListBox (BottomListBox){
+    return Container(
+//      color: Colors.white,
+      margin: EdgeInsets.only(top: 15),
+      decoration: BoxDecoration(
+        color: Colors.white
+      ),
+      child: Column(
+        children: createdList(BottomListBox),
+      ),
+    );
+  }
+
+  createdList(lists) {
+    //1.创建一个空数组并且有返回的组件类型(根据父元素需要的子组件类型)
+    List<Widget> Temlist = [];
+    //2.forEach变量，并往1添加子项组件
+    lists.forEach((item){
+      Temlist.add(createItem(item));
+    });
+//  3.返回
+    return Temlist;
+  }
+
+    createItem(item)  {
+    return InkWell(
+        onTap:(){
+          print('-------------------isLogin---------------------》》》$isLogin');
+
+            print(item['index'].toString());
+
+            var PageList = [CarListPage()];
+            if(item['index']==0) {
+              print('-------------------item 0---------------------》》》');
+              if(isLogin==false) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) {
+                    return LoginPage(pageFrom:'MyPage');
+                  }),
+                );
+                return;
+              }
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return CarListPage();
+                }),
+              );
+            } else if(item['index']==3) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) {
+                  return SettingPage();
+                }),
+              );
+            }
+            else {
+              print('-------------------item 其他---------------------》》》');
+              return showToast('该功能暂未开通');
+            }
+
+
+
+        },
+      child: Container(
+        decoration: BoxDecoration(
+          border: Border(bottom:BorderSide(width: 1,color: Colors.black12))
+        ),
+        padding: EdgeInsets.only(left: 7,right: 7,top:12,bottom: 12),
+        child: Stack(
+          children: [
+            Row(
+              children: [
+                Image.asset(item['icon'],width: ScreenUtil().setWidth(46), height:ScreenUtil().setWidth(46)),
+                Container(child: Text(item['label']),margin: EdgeInsets.only(left: 8),)
+              ],
+            ),
+            Positioned(child: Icon(Icons.keyboard_arrow_right),right: 0,)
+          ],
+        )
+      )
+    );
+  }
+
+  Widget cardinfo() {
+    return Container(
+      child: Stack(
+        children: [
+          Opacity(opacity: 0.5,child: Image.asset('images/login_bg4.png',width: ScreenUtil().setWidth(750), height:ScreenUtil().setWidth(500),fit: BoxFit.fill),),
+          Positioned(
+            right: 50,
+            top: 20,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(ScreenUtil().setWidth(71)),
+              child: Image.asset('images/user_img02.png',width: ScreenUtil().setWidth(140), height:ScreenUtil().setWidth(140)),
             ),
           ),
-
-        ),
-      )
-    );
-
-
-
-  }
-}
-//获取上一步参数
-_selectedBox(BuildContext context,id) {
-  return Container(
-    child: Text(id),
-  );
-}
-
-
-//获取上一步参数
-_adressBox(BuildContext context) {
-  return Container(
-    padding: EdgeInsets.only(bottom: 10),
-    color: Colors.white,
-    child:  Column(
-      children: [
-        Container(
-          margin: EdgeInsets.only(top:ScreenUtil().setWidth(15)),
-          child: Row(children: [
-            Image.asset('images/icon_addres_start.png',width: ScreenUtil().setWidth(60),height: ScreenUtil().setWidth(60)),
-            Container(
-              margin: EdgeInsets.only(left:ScreenUtil().setWidth(10)),
-              width: ScreenUtil().setWidth(620),child: Text('上海市闵行区顾戴路  七星路交叉路口向南200米 公交站牌附近'),
-            )
-          ]),
-        ),
-        Container(
-          margin: EdgeInsets.only(top:ScreenUtil().setWidth(15)),
-          child: Row(children: [
-            Image.asset('images/icon_addres_end.png',width: ScreenUtil().setWidth(60),height: ScreenUtil().setWidth(60)),
-            Container(
-              margin: EdgeInsets.only(left:ScreenUtil().setWidth(10)),
-              width: ScreenUtil().setWidth(620),child: Text('上海市青浦区徐泾镇  明珠路229号'),
-            )
-          ]),
-        )
-      ],
-    ),
-  );
-
-}
-
-//详情大列表
-_detailList(BuildContext context,title,listDescs) {
-  return Container(
-    margin: EdgeInsets.only(top:ScreenUtil().setWidth(20)),
-    padding: EdgeInsets.only(top:10,bottom: 10),
-    color: Colors.white,
-    child:  Column(
-      children: [
-        Container(
-          child: Row(children: [
-            Container(
-              margin: EdgeInsets.only(left:ScreenUtil().setWidth(10)),
-              padding: EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                border: Border(bottom:BorderSide(width: 1,color: Colors.black12))
+          Positioned(
+            left: 20,
+            top: 40,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              children: [
+//                Text(isLogin.toString()),
+                Text(isLogin== true?(isCertified?'已认证':'未认证')
+                    :
+                  '您还未登录，请去登录',
+                  style: TextStyle(fontSize: isLogin==true? 20:17),),
+                Container(child: isLogin==true? Text(mobile,style: TextStyle(fontSize: 16)):Text(''),margin: EdgeInsets.only(left: 5),)],
+            ),
+          ),
+          isLogin== true?isCertified?Positioned(
+            left: 20,
+            top: 90,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              children: [
+                Text('账户余额',style: TextStyle(fontSize: 20),),
+                Container(child: Text('0',style: TextStyle(fontSize: 20)),margin: EdgeInsets.only(left: 5),)],
+            ),
+          ):
+          Positioned(
+              left: 20,
+              top: 70,
+              child: Row(
+                crossAxisAlignment:CrossAxisAlignment.center,
+                children: [
+                  InkWell(
+                    onTap: (){
+                      gotoCertified();
+                    },
+                    child: Container(
+                      child: Text('完成认证即可快速联系货主',style: TextStyle(fontSize: 17),),
+                      decoration: BoxDecoration(border: Border(bottom: BorderSide(width: 1,color: Colors.black))),
+                    ),
+                  )
+                  ,Icon(Icons.keyboard_arrow_right,size: 24,)
+                ],
+              )
+          ):Positioned(
+            left: 10,
+            top: 70,
+            child: Container(
+              width:80.0,
+              height:32.0,
+              child:
+              FittedBox(
+                fit: BoxFit.fitHeight,
+                child: FlatButton(
+                  child: Text('登录',style: TextStyle(color: Colors.white,fontSize: ScreenUtil().setSp(36))),color: Color(0xff6884f1),onPressed: (){
+                  gotoLogin();
+                },),
+              )
+//                RaisedButton(
+//                  color: Color(0xff6884f1),
+//                  onPressed: () {
+//                    gotoLogin();
+//                  },
+//                  child: Text(
+//                    '登录', style: TextStyle(fontSize: 14, color: Colors.white),),
+//                ),
               ),
-              width: ScreenUtil().setWidth(670),child: Text(title,style: TextStyle(fontSize: ScreenUtil().setSp(32),fontWeight: FontWeight.w600),),
-            )
-          ]),
-        ),
-        Container(
-          margin: EdgeInsets.only(top:ScreenUtil().setWidth(15)),
-            padding: EdgeInsets.all(ScreenUtil().setWidth(15)),
-            child:Table(
-              columnWidths: {0:FractionColumnWidth(0.25)},
-              children: createTableList2(listDescs)
-            )
-        )
-      ],
-    ),
-  );
-
-}
-
-createTableList(lists) {
-//  return lists.map((item)=>createTableItem(item).toList());
-  List<TableRow> Tlist = <TableRow>[];
-  dynamic content;
-  for (var i = 0; i < lists.length; i++) {
-    content = TableRow(
-      children: [
-        Text(lists[i]['label'].toString()),
-        Container(
-          padding: EdgeInsets.only(bottom: 10),
-          child:  Text(lists[i]['value'].toString()),
-        )
-      ],
+            ),
+        ],
+      ),
     );
-    Tlist.add(content);
   }
-  return Tlist;
-}
-//根据数据创建列表
-createTableList2(lists) {
-//  return lists.map((item)=>createTableItem(item).toList());
-  //1.创建一个空数组并且有返回的组件类型(根据父元素需要的子组件类型)
-  List<TableRow> Tlist = [];
-  //2.forEach变量，并往1添加子项组件
-  lists.forEach((item){
-    Tlist.add(createTableItem(item));
-  });
-//  3.返回
-  return Tlist; //可根据需要包裹组件修改外观
-}
-//创建每列表的每一项布局
-createTableItem (item) {
-  return TableRow(
-    children: [
-      Text(item['label'].toString()), //安全起见转一下字符串，如果确保是字符串可以不转
-      Container(
-        padding: EdgeInsets.only(bottom: 10),
-        child:  Text(item['value'].toString()),
-      )
-    ],
-  );
-}
 
+  @override
+  // TODO: implement wantKeepAlive
+//  bool get wantKeepAlive => throw UnimplementedError();
+  bool get wantKeepAlive => true;
+}

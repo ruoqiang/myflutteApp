@@ -6,18 +6,19 @@ import 'package:image_picker/image_picker.dart';
 import 'package:myflutterapp/base_widgit/fixedAppbar.dart';
 import 'package:myflutterapp/base_widgit/showToast.dart';
 import 'package:myflutterapp/common/http.dart';
+import 'package:myflutterapp/pages/my_page.dart';
 import 'package:myflutterapp/pages/user_carinfo.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../base_widgit/nextButton.dart';
+import 'index_page.dart';
 
 
-// ignore: camel_case_types
-class AddCarBaseInfoPage extends StatefulWidget {
+class AddCarOtherInfoPage extends StatefulWidget {
   @override
-  _AddCarBaseInfoState createState() => _AddCarBaseInfoState();
+  _AddCarOtherInfoState createState() => _AddCarOtherInfoState();
 }
 
-class _AddCarBaseInfoState extends State<AddCarBaseInfoPage> {
+class _AddCarOtherInfoState extends State<AddCarOtherInfoPage> {
   var _inputController;
 
 //  var _nameController;
@@ -40,12 +41,17 @@ class _AddCarBaseInfoState extends State<AddCarBaseInfoPage> {
       r'^((13[0-9])|(14[0-9])|(15[0-9])|(16[0-9])|(17[0-9])|(18[0-9])|(19[0-9]))\d{8}$');
 
   goToNextPage2() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) {
-        return UserCarInfoPage();
-      }),
-    );
+    showToast('提交成功',backgroundColor: Colors.green);
+
+    Future.delayed(Duration(seconds: 2), (){
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return IndexPage();
+        }),(check) => false
+      );
+    });
+
   }
 
   goToNextPage() async {
@@ -92,10 +98,10 @@ class _AddCarBaseInfoState extends State<AddCarBaseInfoPage> {
     print('dddddd：>>>>>>>>>>>>>-----------------------------------$params');
     await post('SubInfo/CheckStep', formData: params).then((val) {
       print('dddddd：>>>>>>>>>>>>>-----------------------------------$val');
-      Navigator.push(
+      Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) {
-          return UserCarInfoPage();
+          return MyPage();
         }),
       );
     });
@@ -139,10 +145,8 @@ class _AddCarBaseInfoState extends State<AddCarBaseInfoPage> {
           children: <Widget>[
             _headeText(),
             _headeLine(),
-
-            _formCarImgList(),
             _formcarBaseInfoBox(),
-            NextButton(text: '提交', ButtonClick: goToNextPage)
+            NextButton(text: '提交', ButtonClick: goToNextPage2)
           ],
         ),
       ),
@@ -155,11 +159,10 @@ class _AddCarBaseInfoState extends State<AddCarBaseInfoPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text('车辆基础信息',
-            style: TextStyle(color: Color(0xff2D4ED1), fontSize: 14),),
+          Text('车辆基础信息',),
           Container(
             margin: EdgeInsets.only(left: 82, right: 2),
-            child: Text('车辆其他信息'),
+            child: Text('车辆其他信息',style: TextStyle(color: Color(0xff2D4ED1), fontSize: 14),),
           ),
         ],
       ),
@@ -172,7 +175,14 @@ class _AddCarBaseInfoState extends State<AddCarBaseInfoPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Image.asset('images/index_apply_icon_choose_blue.png', width: 20,),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              width: 20,
+              height: 20,
+              color: Colors.black12,
+            ),
+          ),
           Container(
             margin: EdgeInsets.only(left: 2, right: 2),
             decoration: BoxDecoration(
@@ -184,14 +194,8 @@ class _AddCarBaseInfoState extends State<AddCarBaseInfoPage> {
             height: 0,
             child: Text('', textAlign: TextAlign.center),
           ),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Container(
-              width: 20,
-              height: 20,
-              color: Colors.black12,
-            ),
-          ),
+          Image.asset('images/index_apply_icon_choose_blue.png', width: 20,),
+
         ],
       ),
     );
@@ -202,7 +206,7 @@ class _AddCarBaseInfoState extends State<AddCarBaseInfoPage> {
       color: Colors.white,
       child: Column(
         children: <Widget>[
-          _formList(Text('基础信息')),
+          _formList(Text('其他信息')),
           _formList(_labelAndInput('车牌颜色', '请输入车牌颜色', _nameController)),
           _formList(_labelAndInput('车牌号', '请输入车牌号', _nameController)),
           _formList(_labelAndInput('发动机号', '请输入发动机号', _nameController)),
@@ -220,88 +224,20 @@ class _AddCarBaseInfoState extends State<AddCarBaseInfoPage> {
       child: Column(
         children: <Widget>[
           _formList(Text(
-            '基础信息', style: TextStyle(fontSize: ScreenUtil().setSp(32)),)),
-          _formList(_labelAndInput('车牌颜色:', '请输入车牌颜色', _nameController)),
-          _formList(_labelAndInput('车牌号:', '请输入车牌号', _nameController)),
-          _formList(_labelAndInput('发动机号:', '请输入发动机号', _nameController)),
-          _formList(_labelAndInput('车辆识别代码:', '请输入车辆识别代码', _nameController)),
-          _formList(_labelAndInput('品牌型号:', '请输入品牌型号', _nameController)),
+            '其他信息', style: TextStyle(fontSize: ScreenUtil().setSp(32)),)),
+          _formList(_labelAndInput('载货长度（车身长度）:', '请输入车牌颜色', _nameController)),
+          _formList(_labelAndInput('其他长度:', '请输入其他长度', _nameController)),
+          _formList(_labelAndInput('车辆类型:', '请输入车辆类型', _nameController)),
+          _formList(_labelAndInput('货运类型:', '请输入货运类型', _nameController)),
+          _formList(_labelAndInput('载重:', '请输入载重', _nameController)),
+          _formList(_labelAndInput('容积:', '请输入载重', _nameController)),
+
         ],
       ),
     );
   }
 
-  Widget _formCarImgList() {
-    return Container(
-      margin: EdgeInsets.only(bottom: 15),
-      color: Colors.white,
-      child: Column(
-        children: <Widget>[
-          _formList(Text(
-            '行驶证照片信息', style: TextStyle(fontSize: ScreenUtil().setSp(32)),)),
-          _carImgList()
-        ],
-      ),
-    );
-  }
 
-  Widget _carImgList() {
-    return Container(
-      color: Color(0xffffffff),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: () {
-              _pickImage(0);
-            },
-            child: Container(
-              margin: EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
-              alignment: Alignment.centerLeft,
-              child: Column(
-                children: [
-                  _uploadImage1 ==null ?
-                  Image.asset('images/car_info_defaul01.png', height: 140,
-                    width: 140,): Container(
-                    decoration:BoxDecoration(
-                      border:Border.all(color: Colors.black12,width: 1), //底部border
-                    ),
-                    child: Image.file(_uploadImage1, height: 140,width: 140,),
-                  ),
-                  Container(
-                    child: Text('上传行驶证正页照'), margin: EdgeInsets.only(top: 10),)
-                ],
-              ),
-            ),
-          ),
-          GestureDetector(
-            onTap: () {
-              //
-              _pickImage(1);
-            },
-            child: Container(
-              margin: EdgeInsets.only(left: 15, right: 15, top: 15, bottom: 15),
-              alignment: Alignment.centerLeft,
-              child: Column(
-                children: [
-                  _uploadImage2 == null ? Image.asset('images/car_info_defaul02.png', height: 140,width: 140,)
-                      :
-                  Container(
-                      decoration:BoxDecoration(
-                      border:Border.all(color: Colors.black12,width: 1), //底部border
-                      ),
-                      child: Image.file(_uploadImage2, height: 140,width: 140,),
-                  ),
-                  Container(
-                    child: Text('上传行驶证反页照'), margin: EdgeInsets.only(top: 10),)
-                ],
-              ),
-            ),
-          )
-        ],
-      ),
-    );
-  }
 
   Widget _formList(widgit) {
     return Container(
@@ -347,33 +283,6 @@ class _AddCarBaseInfoState extends State<AddCarBaseInfoPage> {
     ],
     );
   }
-
-
-
-
-  _pickImage(index) {
-    showModalBottomSheet(
-        context: context,
-        builder: (context) => Container(
-          height: 160,
-          child: Column(
-            children: <Widget>[
-              _item('拍照', true,index),
-              _item('从相册选择', false,index),
-            ],
-          ),
-        ));
-  }
-  _item(String title, bool isTakePhoto,index) {
-    return GestureDetector(
-      child: ListTile(
-        leading: Icon(isTakePhoto ? Icons.camera_alt : Icons.photo_library),
-        title: Text(title),
-        onTap: () => getImage(isTakePhoto,index),
-      ),
-    );
-  }
-
 
 
 //  带验证码，输入框的列

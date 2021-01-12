@@ -11,7 +11,7 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.0.4
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -19,17 +19,26 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  dio: ^2.0.7 
-  flutter_screenutil: ^0.5.1
+  dio: ^3.0.9
+  flutter_screenutil: ^3.1.0
   flutter_swiper : ^1.1.4
   provide: ^1.0.2
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^0.1.2
-  fluro: "^1.4.0"
+  fluro: "^1.7.8"
   flutter_webview_plugin: ^0.3.0+2
   shared_preferences: ^0.5.1
   fluttertoast: ^3.0.4
+  flutter_splash_screen: ^0.1.0
+  flutter_easyrefresh: ^2.1.7
+  image_picker: ^0.6.7+15
+  url_launcher: ^5.7.10
+  tab_indicator_styler: ^1.0.0
+  flutter_localizations: # Add this line
+    sdk: flutter
+  flutter_my_picker: ^1.0.3
+  flutter_app_upgrade: ^1.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -78,9 +87,21 @@ flutter:
    - images/index_apply_icon_choose_blue.png
    - images/index_apply_icon_choose.png
    - images/index_apply_icon_choose_gray.png
+   - images/user_img01.png
+   - images/user_img02.png
+   - images/user_img03.png
+   - images/icon_addres_end.png
+   - images/icon_addres_start.png
 
 
-  #  - images/a_dot_ham.jpeg
+   - images/icon-car.png
+   - images/icon-share.png
+   - images/question.png
+   - images/setting.png
+   - images/login_bg4.png
+   - images/img01.png
+   - images/car_info_defaul01.png
+   - images/car_info_defaul02.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.io/assets-and-images/#resolution-aware.

@@ -12,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../routers/application.dart';
 import 'package:myflutterapp/base_widgit/appbar.dart';
 
+import 'my_page.dart';
+
 class RegisterPage extends StatefulWidget {
   @override
   _RegisterState createState() => _RegisterState();
@@ -123,14 +125,21 @@ void _register() async{
       showToast('注册成功');
       _prefs.setString('token',val['result']['Token']);
       _prefs.setString('mobile',phoneController.text);
+      _prefs.setBool('isLogin', true);
       //跳转逻辑跟登录一样。。先省略
+      Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) {
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) {
-          return IndexPage();
-        }),
+            return IndexPage();
+          }),(check) => false
       );
+//      Navigator.push(
+//        context,
+//        MaterialPageRoute(builder: (context) {
+//          return IndexPage();
+//        }),
+//      );
     });
   }
 

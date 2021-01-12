@@ -1,6 +1,7 @@
 import 'package:fluro/fluro.dart';
 import 'package:flutter/material.dart';
 import 'package:myflutterapp/base_widgit/create_my_input.dart';
+import 'package:myflutterapp/base_widgit/showToast.dart';
 import 'package:myflutterapp/pages/details_page.dart';
 import 'package:myflutterapp/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -20,11 +21,14 @@ class _ForgetState extends State<ForgetPage> {
   TextEditingController phoneController = TextEditingController();
   //密码的控制器
   TextEditingController passwordController = TextEditingController();
+  //验证码的控制器
+  TextEditingController codeController = TextEditingController();
   @override
   void initState() {
     getValueFromLocalToForm();
     super.initState();
   }
+
   //获取本地持久化数据
   getValueFromLocalToForm() async {
     SharedPreferences _prefs = await SharedPreferences.getInstance();
@@ -40,7 +44,16 @@ class _ForgetState extends State<ForgetPage> {
     SharedPreferences  _prefs =  await SharedPreferences.getInstance();
     _prefs.setString('mobile',phoneController.text);
   }
-  
+
+  getCode() {
+    print({'手机号': phoneController, '密码': passwordController.text});
+    if(phoneController.text == ''){
+      showToast("请输入手机号");
+      return;
+    }
+  }
+
+
   @override
   Widget build(BuildContext context) {
 
@@ -79,16 +92,17 @@ class _ForgetState extends State<ForgetPage> {
                 ),
                 Stack(
                   children: <Widget>[
-                    CreateMyInput(iconString:'images/login_register_icon_verification.png',placeholder:"请输入验证码",isPassword:false,inputController:passwordController),
+                    CreateMyInput(iconString:'images/login_register_icon_verification.png',placeholder:"请输入验证码",isPassword:false,inputController:codeController),
                     Positioned(
                       top:3,
                       right: 20,
                       child: InkWell(
                         onTap: (){
                           print('ddddd');
-                          setState(() {
-                            isOpen = !isOpen;
-                          });
+                          getCode();
+//                          setState(() {
+//                            isOpen = !isOpen;
+//                          });
                         },
                         child: Container(
                           alignment: Alignment.center,

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/screenutil.dart';
 import 'package:myflutterapp/base_widgit/fixedAppbar.dart';
 import 'package:url_launcher/url_launcher.dart';
-class SearchGoodsDetailPage extends StatelessWidget {
+class OrderDetailPage extends StatelessWidget {
   final id;
-  SearchGoodsDetailPage({this.id});
+  OrderDetailPage({this.id});
 
   final List<Map> listDescs1 = [{'label':'货物类型:','value':'设备、牛奶'},{'label':'重量:','value':'10吨'},{'label':'体积:','value':'10立方'},{'label':'装货时间:','value':'2010-02-20'}];
   final List<Map> listDescs2 = [{'label':'车辆类型:','value':'零担 6.2米 厢式 10吨'},{'label':'重量:','value':'10吨'},{'label':'特殊要求:','value':'冷链'}];
@@ -14,31 +14,31 @@ class SearchGoodsDetailPage extends StatelessWidget {
   final List<Map> listDescs4 = [{'label':'货主:','value':'张三'},{'label':'联系电话:','value':'18226796732'}];
   var pressAttention = false;
 
-  _getOrder() {
-    print('接单');
-//    showToast('接单成功',backgroundColor:Colors.pink,time: 2);
-    //打电话
-    _launchURL();
+  _back(context) {
+      Navigator.pop(context);
   }
-  //打电话
-  void _launchURL() async {
-    String url = 'tel:'+ '18226796732';
-    if (await canLaunch(url)) {
-      await launch(url);
-    } else {
-      throw 'Could not launch $url';
-    }
-  }
+
   @override
   Widget build(BuildContext context) {
+    print('id---------$id');
+    String btnText = '已完成';
+    Color bColor = Colors.green;
+    if(id ==0) {
+      btnText = '已完成';
+       bColor = Colors.green;
+    } else if(id ==1) {
+      btnText = '进行中';
+       bColor = Colors.deepOrange;
+    }
     return Scaffold(
-      appBar:  fixedAppbar(title:'货源详情'),
+      appBar:  fixedAppbar(title:'运单详情'),
       body: SingleChildScrollView(
         child: Container(
           margin: EdgeInsets.all(ScreenUtil().setWidth(20)),
           child: SafeArea(
             child: Column(
                 children: <Widget>[
+                  _OrderStatus(btnText,bColor),
                   _adressBox(context),
                   _detailList(context,'货源信息',listDescs1),
                   _detailList(context,'所需车辆信息',listDescs2),
@@ -58,14 +58,14 @@ class SearchGoodsDetailPage extends StatelessWidget {
                                 splashColor:Color(0xff2D4ED1),
                                 color: Color(0xff2D4ED1),
                                 onPressed: (){
-                                  _getOrder();
+                                  _back(context);
                                   // setState(() => pressAttention = !pressAttention);
                                 },
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(3)
                                 ),
                                 textColor:  Colors.white ,//pressAttention ? Colors.white : Color(0xff2D4ED1),
-                                child: Text("联系货主"),
+                                child: Text("返回"),
                               ),
                             ),
                           ),
@@ -123,8 +123,25 @@ _adressBox(BuildContext context) {
     ),
   );
 
+
 }
 
+_OrderStatus (Txt,backGroundColor) {
+  return Container(
+    margin: EdgeInsets.only(bottom:ScreenUtil().setWidth(20)),
+    padding: EdgeInsets.only(top:10,bottom: 10),
+    color:Colors.white,
+    child: Row(
+      children: [
+        Expanded(
+          child: Container(
+            padding: EdgeInsets.only(left: 5),
+            child: Text(Txt,style: TextStyle(color: backGroundColor,fontSize: ScreenUtil().setWidth(40)),),
+          )
+      )],
+    )
+    );
+}
 //详情大列表
 _detailList(BuildContext context,title,listDescs) {
   return Container(

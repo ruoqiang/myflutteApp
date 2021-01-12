@@ -1,25 +1,28 @@
 class GoodsListModel {
-  String code;
-  String message;
-  List<GoodsListData> data;
+  String count;
+  String hasMore;
+  String currentPage;
+  List<GoodsListModelData> data;
 
-  GoodsListModel({this.code, this.message, this.data});
+  GoodsListModel({this.count, this.hasMore, this.currentPage, this.data});
 
   GoodsListModel.fromJson(Map<String, dynamic> json) {
-    code = json['code'];
-    message = json['message'];
+    count = json['count'];
+    hasMore = json['hasMore'];
+    currentPage = json['currentPage'];
     if (json['data'] != null) {
-      data = new List<GoodsListData>();
+      data = new List<GoodsListModelData>();
       json['data'].forEach((v) {
-        data.add(new GoodsListData.fromJson(v));
+        data.add(new GoodsListModelData.fromJson(v));
       });
     }
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['code'] = this.code;
-    data['message'] = this.message;
+    data['count'] = this.count;
+    data['hasMore'] = this.hasMore;
+    data['currentPage'] = this.currentPage;
     if (this.data != null) {
       data['data'] = this.data.map((v) => v.toJson()).toList();
     }
@@ -27,35 +30,43 @@ class GoodsListModel {
   }
 }
 
-class GoodsListData {
-  String image;
-  double oriPrice;
-  double presentPrice;
-  String goodsName;
-  String goodsId;
+class GoodsListModelData {
+  String startAddress;
+  String endAddress;
+  String goodsType;
+  String createTime;
+  String status;
+  String needsCar;
+  String id;
 
-  GoodsListData(
-      {this.image,
-        this.oriPrice,
-        this.presentPrice,
-        this.goodsName,
-        this.goodsId});
+  GoodsListModelData(
+      {this.startAddress,
+        this.endAddress,
+        this.goodsType,
+        this.createTime,
+        this.status,
+        this.needsCar,
+        this.id});
 
-  GoodsListData.fromJson(Map<String, dynamic> json) {
-    image = json['image'];
-    oriPrice = json['oriPrice'];
-    presentPrice = json['presentPrice'];
-    goodsName = json['goodsName'];
-    goodsId = json['goodsId'];
+  GoodsListModelData.fromJson(Map<String, dynamic> json) {
+    startAddress = json['startAddress'];
+    endAddress = json['endAddress'];
+    goodsType = json['goodsType'];
+    createTime = json['createTime'];
+    status = json['status'];
+    needsCar = json['needsCar'];
+    id = json['id'];
   }
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = new Map<String, dynamic>();
-    data['image'] = this.image;
-    data['oriPrice'] = this.oriPrice;
-    data['presentPrice'] = this.presentPrice;
-    data['goodsName'] = this.goodsName;
-    data['goodsId'] = this.goodsId;
+    data['startAddress'] = this.startAddress;
+    data['endAddress'] = this.endAddress;
+    data['goodsType'] = this.goodsType;
+    data['createTime'] = this.createTime;
+    data['status'] = this.status;
+    data['needsCar'] = this.needsCar;
+    data['id'] = this.id;
     return data;
   }
 }

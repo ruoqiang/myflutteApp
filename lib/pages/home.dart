@@ -5,12 +5,11 @@ import 'dart:async';
 import 'dart:convert';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
+import 'package:myflutterapp/base_widgit/fixedAppbar.dart';
 import 'package:myflutterapp/base_widgit/webview.dart';
 import 'package:myflutterapp/common/http.dart';
 import 'package:myflutterapp/pages/login.dart';
 import 'package:myflutterapp/pages/process.dart';
-import 'package:myflutterapp/pages/search.dart';
-import 'package:myflutterapp/pages/shopping_cart.dart';
 import 'package:myflutterapp/pages/user_base_info.dart';
 import 'package:myflutterapp/pages/user_center.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -47,7 +46,7 @@ class _HomePageState extends State<HomePage> {
     };
     //全局Provide
     var currentMenuIndexCount = Provide.value<CurrentMenuIndexProvide>(context);
-    
+
     await post('Main/MainQuest',formData:params).then((val){
       if(val['issuccess'] ==false) {
         Navigator.push(
@@ -57,11 +56,11 @@ class _HomePageState extends State<HomePage> {
          }),
        );
       } else if(val['issuccess'] ==true) {
-        var pageList = [ProcessPage(),ShopCart(),UserCenterPage(),SearchPage()];
+        var pageList = [ProcessPage(),UserCenterPage()];
         Navigator.push(
          context,
          MaterialPageRoute(builder: (context) {
-           return pageList[currentMenuIndexCount.value];
+           return pageList[currentMenuIndexCount.currentIndex];
          }),
        );
       }
@@ -69,9 +68,10 @@ class _HomePageState extends State<HomePage> {
  }
   @override
   Widget build(BuildContext context) {
-   
+
     return Scaffold(
-      // appBar: AppBar(title: Text('My testhPage2')),
+//       appBar: AppBar(title: Text('首页')),
+      appBar: fixedAppbar(title:'运单'),
       body:Container(
           child:SingleChildScrollView(
             child: SafeArea(
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
               children: <Widget>[
                   slideList.length >0 ?SlideList(slideList: slideList,):new Text(''),
                 MenuNavigator(menuNavigatorList:menuNavigatorList,goToNextPage: checkToken),
-                
+
                 Actionlist(title:'活动推荐',actionlistList:actionlistList),
                 // RaisedButton(child: Text('跳转到个人信息',style: TextStyle(color: Colors.deepPurple),),onPressed: () {
                 //   checkToken(1);
@@ -115,7 +115,7 @@ class MenuNavigator extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
         children: menuNavigatorList.map((item) {
-          
+
           return _getMenuItem(context, item,goToNextPage);
         }).toList(),
       ),
@@ -123,7 +123,7 @@ class MenuNavigator extends StatelessWidget {
   }
   Widget _getMenuItem(BuildContext context, item,goToNextPage){
     var currentMenuIndexCount = Provide.value<CurrentMenuIndexProvide>(context);
-   
+
     return Container(
       child: InkWell(
       onTap: () {
@@ -171,7 +171,7 @@ class SlideList extends StatelessWidget {
 class Actionlist extends StatelessWidget {
   final String title;
   final List actionlistList;
-  
+
   Actionlist({Key key, this.title,this.actionlistList,}) : super(key: key);
 
   @override
@@ -202,27 +202,30 @@ class Actionlist extends StatelessWidget {
     return Container(
       margin: index ==1 ?EdgeInsets.only(right: 0):EdgeInsets.only(right: 10),
       child: InkWell(
-      onTap: () {
-        Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) {
-                  // var model = item[index];
-                  return WebView(
-                      url: item['url'],
-                      title: item['title'],
-                      hideAppBar: false);
-                }),
-              );
-      },
-      child: Column(
-        children: <Widget>[
-          Image.asset(
-            item['image'],
-            width: 250.0,
+            onTap: () {
+              Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) {
+                        // var model = item[index];
+                        return WebView(
+                            url: item['url'],
+                            title: item['title'],
+                            hideAppBar: false);
+                      }),
+                    );
+            },
+            child: Column(
+              children: <Widget>[
+                Image.asset(
+                  item['image'],
+                  width: 250.0,
+                ),
+              ],
+            ),
           ),
-        ],
-      ),
-    ),
     );
   }
 }
+
+
+

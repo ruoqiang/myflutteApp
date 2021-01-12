@@ -9,7 +9,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:myflutterapp/common/http.dart';
 
-import 'package:myflutterapp/pages/search.dart';
 import 'package:myflutterapp/pages/user_base_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../base_widgit/popup/popup.dart';
@@ -151,7 +150,7 @@ class _ProcessPageState extends State<ProcessPage> {
         bottom: 0,
         child: PopupContent(
           content: Scaffold(
-            appBar: fixedAppbar(title),
+            appBar: fixedAppbar(title:title),
             body: SingleChildScrollView(
               child: Column(
                 children: <Widget>[
@@ -335,7 +334,7 @@ Widget myText(text){
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) {
-            return SearchPage();
+//            return SearchPage();
           }),
         );
       }

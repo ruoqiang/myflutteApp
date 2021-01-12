@@ -3,13 +3,13 @@ import 'package:dio/dio.dart';
 import 'package:myflutterapp/common/config.dart';
 import '../base_widgit/showToast.dart';
 
+
 Future request(url, {formData}) async {
   try {
     print('开始获取数据...............');
     Response response;
     Dio dio = new Dio();
-    dio.options.contentType =
-        ContentType.parse("application/x-www-form-urlencoded");
+    dio.options.contentType = "application/x-www-form-urlencoded";
     if (formData == null) {
       response = await dio.post(servicePath[url]);
     } else {
@@ -30,8 +30,7 @@ Future post(url, {formData}) async {
     print('开始获取数据...............');
     Response response;
     Dio dio = new Dio();
-    dio.options.contentType =
-        ContentType.parse("application/x-www-form-urlencoded");
+    dio.options.contentType ="application/x-www-form-urlencoded";
     if (formData == null) {
       response = await dio.post(apiUrl + url);
     } else {

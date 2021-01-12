@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class CurrentMenuIndexProvide with ChangeNotifier{
-  int value=0;
+  int currentIndex=1;
   
   changeIndex(int newIndex){
-    value=newIndex;
+    currentIndex=newIndex;
     notifyListeners();
   }
 

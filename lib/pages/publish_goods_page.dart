@@ -1,451 +1,493 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_easyrefresh/easy_refresh.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:myflutterapp/base_widgit/fixedAppbar.dart';
 import 'package:myflutterapp/base_widgit/showToast.dart';
-import 'package:myflutterapp/pages/serach_goods_detail_page.dart';
-import 'package:myflutterapp/provide/count.dart';
-import '../base_widgit/appbar.dart';
+import 'package:myflutterapp/common/http.dart';
+import 'package:myflutterapp/pages/add_car_other_info.dart';
+import 'package:myflutterapp/pages/user_carinfo.dart';
+import 'package:myflutterapp/provide/currentMenuIndex.dart';
+import 'package:provide/provide.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../base_widgit/nextButton.dart';
+import 'package:flutter_my_picker/flutter_my_picker.dart';
+import 'package:flutter_my_picker/common/date.dart';
+var _controller;
+// ignore: camel_case_types
+class PublishGoodsPage extends StatefulWidget {
+  final changePage;
+  PublishGoodsPage({this.changePage});
 
-class SearchGoodsPage extends StatefulWidget {
+
+
   @override
-  _SearchGoodsPageState createState() => _SearchGoodsPageState();
+  _PublishGoodsPageState createState() => _PublishGoodsPageState();
+
+
 }
 
-class _SearchGoodsPageState extends State<SearchGoodsPage> {
-  EasyRefreshController _controller;
-  int _count = 10;
-
-  String _mySelection1 = '全国';
-
-  changeFn1(newVal) {
-    print('changeFn1,,d的回调$newVal');
-    setState(() {
-      _mySelection1 = newVal;
-    });
-  }
-
-  String _mySelection2 = '上海';
-
-  changeFn2(newVal) {
-    setState(() {
-      _mySelection2 = newVal;
-    });
-  }
-
-  String _mySelection3 = '智能排序';
-  String _mySelection4 = '筛选';
-
-  changeFn4(newVal) {
-    setState(() {
-      _mySelection4 = newVal;
-    });
-  }
-
+class _PublishGoodsPageState extends State<PublishGoodsPage> {
   @override
-  void initState() {
-    print('SearchGoodsPage-----执行了');
+  void didChangeDependencies() {
+    print('------didChangeDependencies-------');
+    super.didChangeDependencies();
+  }
+
+  //输入框控制器
+  TextEditingController _nameController = TextEditingController();
+  TextEditingController _idNumberController = TextEditingController();
+  TextEditingController _mobileController = TextEditingController();
+  TextEditingController _inviteController = TextEditingController();
+
+  TextEditingController _carOwnerNameController = TextEditingController();
+  TextEditingController _carOwnerIDNumController = TextEditingController();
+  TextEditingController _carOwnerPhoneController = TextEditingController();
+
+  RegExp mobileExp = RegExp(
+      r'^((13[0-9])|(14[0-9])|(15[0-9])|(16[0-9])|(17[0-9])|(18[0-9])|(19[0-9]))\d{8}$');
+
+  TextEditingController _addressStartController = TextEditingController();
+  TextEditingController _addressEndController = TextEditingController();
+  TextEditingController _goodsTypeController = TextEditingController();
+  TextEditingController _goodsWeightController = TextEditingController();
+
+  DateTime date;
+  String dateStr ='请选择装货时间';
+  @override
+  initState()  {
     super.initState();
-    _controller = EasyRefreshController();
+//    DateTime _date = new DateTime.now();
+//    print(MyDate.format('yyyy-MM-dd HH:mm:ss', _date));
+//    setState(() {
+//      date = _date;
+//      dateStr = MyDate.format('yyyy-MM-dd HH:mm:ss', _date);
+//    });
   }
 
-  _gotoDetal() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) {
-        return SearchGoodsDetailPage(id: '22');
-      }),
+  _change(formatString) {
+    return (_date) {
+      setState(() {
+        date = _date;
+        dateStr = MyDate.format(formatString, _date);
+      });
+    };
+  }
+
+  showPicker() {
+    if(dateStr =='请选择装货时间') {
+      DateTime _date = new DateTime.now();
+      print(MyDate.format('yyyy-MM-dd HH:mm', _date));
+      setState(() {
+        date = _date;
+        dateStr = MyDate.format('yyyy-MM-dd HH:mm', _date);
+      });
+    }
+    MyPicker.showDateTimePicker(
+      context: context,
+      current: date,
+      magnification: 1.2,
+      squeeze: 1.45,
+      offAxisFraction: 0.2,
+      onChange: _change('yyyy-MM-dd HH:mm'),
     );
+
   }
 
-  changedSort() {}
+
+
+  goToNextPage2() {
+    print('goToNextPage2点击了：>>>>>>>>>>>>>-----------------------------------');
+    if (_addressStartController.text == '') {
+      return showToast("发货开始位置不能为空");
+    }
+    if (_addressEndController.text == '') {
+      return showToast("发货结束位置不能为空");
+    }
+    if (_goodsTypeController.text == '') {
+      return showToast("请输入货物类型");
+    }
+    if (_goodsWeightController.text == '') {
+      return showToast("请输入货物重量");
+    }
+    print('$_goodsTypeController');
+//    setState(() {
+//      _goodsTypeController.text = '';
+//    });
+
+    widget.changePage(1);
+    showToast("发布成功",backgroundColor: Colors.blueAccent);
+
+//    Provide.value<CurrentMenuIndexProvide>(context).changeIndex(1);
+//    var currentindex = Provide.value<CurrentMenuIndexProvide>(context).currentIndex;
+//    print('currentindex：>>>>>>>>>>>>>-----------------------------------$currentindex');
+
+    FocusScope.of(context).unfocus();
+  }
+
+  goToNextPage() async {
+    print({'姓名': _nameController, '密码': _nameController.text});
+    if (_nameController.text == '') {
+      showToast("请输入姓名");
+      return;
+    }
+
+    SharedPreferences _prefs = await SharedPreferences.getInstance();
+    var token = _prefs.getString('token');
+    var api = 'SubInfo/UserAndCar';
+    var params = {
+      'data': {
+        'Step': 1,
+        'CCustomerApply': {
+          "Name": _nameController.text,
+          "IDNumber": _idNumberController.text,
+          "Phone": _mobileController.text,
+          "Inviter": _inviteController.text,
+          "CarOwnerName": _carOwnerNameController.text,
+          "CarOwnerIDNum": _carOwnerIDNumController.text,
+          "CarOwnerPhone": _carOwnerPhoneController.text,
+          "Relation": "11111"
+        }
+      },
+      'token': token
+    };
+    print('dddddd：>>>>>>>>>>>>>-----------------------------------$params');
+    await post('SubInfo/CheckStep', formData: params).then((val) {
+      print('dddddd：>>>>>>>>>>>>>-----------------------------------$val');
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) {
+          return UserCarInfoPage();
+        }),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    print('SearchGoodsPage---build--执行了');
-    return Scaffold(
-      appBar: fixedAppbar(title: '发布货源'),
-      body: Container(
-        child: Column(
-            children: <Widget>[
-//              MyAppBar(title:'找货源',isHasBackBtn:false),
+//    Provide.value<CurrentMenuIndexProvide>(context).changeIndex(1);
+    var currentindex = Provide.value<CurrentMenuIndexProvide>(context).currentIndex;
+    print('currentindex：>>>>>>>>>>>>>-----------------------------------$currentindex');
 
-              Container(
-//                margin: EdgeInsets.only(bottom: 10),
-                child: _selectedBox(context),
-              ),
-              Expanded(
-                  child:
-                  EasyRefresh(
-                      controller: _controller,
-//                      firstRefresh: true,
-                      header: ClassicalHeader(
-                        refreshText: "下拉刷新",
-                        refreshReadyText: "松开后开始刷新",
-                        refreshingText: "正在刷新...",
-                        refreshedText: "刷新完成",
-                        bgColor: Colors.transparent,
-                        textColor: Colors.black87,
-                      ),
-                      footer: ClassicalFooter(
-                        loadText: "上拉加载更多",
-                        loadReadyText: "松开后开始加载",
-                        loadingText: "正在加载...",
-                        loadedText: "加载完成",
-                        noMoreText: "没有更多内容了",
-                        bgColor: Colors.transparent,
-                        textColor: Colors.black87,
-                      ),
-                      onRefresh: () async {
-                        await Future.delayed(Duration(seconds: 2), () {
-                          print('onRefresh');
-                          setState(() {
-                            _count = 10;
-                          });
-                          _controller.resetLoadState();
-                        });
-                        print('---------到底了，上拉开始');
-                        print('---------$_count');
-                      },
-                      onLoad: () async {
-                        await Future.delayed(Duration(seconds: 2), () {
-                          print('onLoad');
-                          setState(() {
-                            _count += 10;
-                          });
-                          print('----------onLoad');
-                          print('---------$_count');
-                          _controller.finishLoad(noMore: _count >= 40);
-                        });
-                      },
-                      child: ListView(
-                        padding: EdgeInsets.only(top: 15),
-                        scrollDirection: Axis.vertical, //垂直列表
-                        children: List.generate(_count, (index) {
-                          return Container(
-                            color: Colors.white,
-                            margin: EdgeInsets.only(bottom: 10),
-                            child: Column(
-                              children: [
-                                _ListTop(),
-                                _listBottom()
-                              ],
-                            ),
-                          );
-                        }),
-                      )
-                  )
+    return  Provide<CurrentMenuIndexProvide>(
 
-              ),
-            ]
-        ),
-
-      ),
-    );
-  }
-
-  Widget _ListTop() {
-    return Container(
-      child: InkWell(
-        onTap: () {
-          showToast('进入货源详情', backgroundColor: Colors.pink,
-              time: 1);
-          Future.delayed(Duration(seconds: 2), () {
-            _gotoDetal();
-          });
-        },
-          child: Row(
-            children: [
-              Container(
-                margin: EdgeInsets.only(left: 3),
-                child: Column(
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(ScreenUtil().setWidth(
-                          50)),
-                      child: Image.asset(
-                        'images/user_img01.png', width: ScreenUtil().setWidth(
-                          96),
-                        height: ScreenUtil().setWidth(96),),
-                    ),
-                    Text('张三', style: TextStyle(fontSize: ScreenUtil().setWidth(
-                        28)),)
-                  ],
-                ),
-              ),
-              Stack(
-                children: [
+        builder: (context,child,val){
+          return Scaffold(
+            appBar: fixedAppbar(title: '发布货源'),
+            body: SingleChildScrollView(
+              child: Column(
+                children: <Widget>[
+                  _formStartEndAdress(),
+                  _formcarBaseInfoBox(),
+                  _formcarBaseInfoBox2(),
+                  _formcarBaseInfoBox3(),
                   Container(
-                    width: ScreenUtil().setWidth(630),
-                    padding: EdgeInsets.only(top: ScreenUtil().setWidth(20),
-                        bottom: ScreenUtil().setWidth(10),
-                        left: ScreenUtil().setWidth(20)),
-                    margin: EdgeInsets.only(top: ScreenUtil().setWidth(10),
-                      right: ScreenUtil().setWidth(10),
-                      bottom: ScreenUtil().setWidth(10),),
-                    decoration: BoxDecoration(
-                      border: Border(bottom: BorderSide(
-                          width: 1, color: Colors.black12)),
-                    ),
-                    child: Column(
-                      children: [
-                        Row(children: [
-                          Image.asset('images/icon_addres_start.png',
-                              width: ScreenUtil().setWidth(40),
-                              height: ScreenUtil().setWidth(40)),
-                          Container(
-                            margin: EdgeInsets.only(
-                              bottom: ScreenUtil().setWidth(10),),
-                            width: ScreenUtil().setWidth(300),
-                            child: Text('上海市闵行区顾戴路上海市闵行区顾戴路上海市闵行区顾戴路',
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                  fontSize: ScreenUtil().setWidth(28)),),
-                          )
-                        ],),
-                        Container(
-                          margin: EdgeInsets.only(
-                            top: ScreenUtil().setWidth(30),),
-                          child: Row(children: [
-                            Image.asset('images/icon_addres_end.png',
-                                width: ScreenUtil().setWidth(40),
-                                height: ScreenUtil().setWidth(40)),
-                            Container(
-                              width: ScreenUtil().setWidth(300),
-                              child: Text('上海市闵行区顾戴路上海市闵行区顾戴路上海市闵行区顾戴路',
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                    fontSize: ScreenUtil().setWidth(28)),),
-                            )
-                          ],),
-                        )
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    right: 10, top: 25,
-                    child: SizedBox(
-                        width: 80,
-                        height: 32,
-                        child:
-                        FittedBox(
-                          fit: BoxFit.fitHeight,
-                          child: FlatButton(
-                            child: Text('货源详情', style: TextStyle(
-                                color: Colors.white,
-                                fontSize: ScreenUtil().setSp(36))),
-                            color: Colors.pink,
-                            onPressed: () {
-                              showToast('进入货源详情', backgroundColor: Colors.pink,
-                                  time: 1);
-                              Future.delayed(Duration(seconds: 2), () {
-                                _gotoDetal();
-                              });
-                            },),
-                        )
-                    ),
+                    margin: EdgeInsets.only(bottom: 30),
+//              child: _nextButton(),
+//                    child: NextButton(text: '发布${val.currentIndex}',ButtonClick:(){
+                      child: NextButton(text: '发布',ButtonClick:(){
+//                      Provide.value<CurrentMenuIndexProvide>(context).changeIndex(1);
+                      goToNextPage2();
+                    },),
                   )
                 ],
-              )
-            ],
-          ),
-      ),
-    );
+              ),
+            ),
+          );
+        });
+
   }
 
-  Widget _listBottom() {
+  Widget _headeText() {
     return Container(
-      margin: EdgeInsets.only(
-          left: ScreenUtil().setWidth(100), bottom: ScreenUtil().setWidth(10)),
-      child: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.only(top: 3),
-            child: Row(children: [
-              Icon(Icons.alarm, size: 14,),
-              Container(
-//              width: ScreenUtil().setWidth(300),
-                constraints: BoxConstraints(
-                    maxWidth: ScreenUtil().setWidth(300)),
-                child: Text('货物类型货物类型货物类型货物类型',
-                  style: TextStyle(fontSize: ScreenUtil().setWidth(24)),
-                  overflow: TextOverflow.ellipsis,),
-              ),
-              Container(
-                width: ScreenUtil().setWidth(300),
-                child: Text('2020-12-23 10:00:00 ',
-                  style: TextStyle(fontSize: ScreenUtil().setWidth(24)),
-                  overflow: TextOverflow.ellipsis,),
-              ),
-            ]),
+      margin: EdgeInsets.only(top: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            '车辆基础信息',
+            style: TextStyle(color: Color(0xff2D4ED1), fontSize: 14),
           ),
           Container(
-            padding: EdgeInsets.only(top: 3),
-            child: Row(children: [
-              Icon(Icons.child_friendly, size: 14,),
-              Container(
-//              width: ScreenUtil().setWidth(300),
-                constraints: BoxConstraints(
-                    maxWidth: ScreenUtil().setWidth(300)),
-                child: Text('货物类型:',
-                  style: TextStyle(fontSize: ScreenUtil().setWidth(24)),
-                  overflow: TextOverflow.ellipsis,),
-              ),
-              Container(
-                width: ScreenUtil().setWidth(300),
-                child: Text('服装、饮料   5吨',
-                  style: TextStyle(fontSize: ScreenUtil().setWidth(24)),
-                  overflow: TextOverflow.ellipsis,),
-              ),
-            ]),
-          ),
-          Container(
-            padding: EdgeInsets.only(top: 3),
-            child: Row(children: [
-              Icon(Icons.airport_shuttle, size: 14,),
-              Container(
-//              width: ScreenUtil().setWidth(300),
-                constraints: BoxConstraints(
-                    maxWidth: ScreenUtil().setWidth(300)),
-                child: Text('车辆需求:',
-                  style: TextStyle(fontSize: ScreenUtil().setWidth(24)),
-                  overflow: TextOverflow.ellipsis,),
-              ),
-              Container(
-                width: ScreenUtil().setWidth(300),
-                child: Text('5米 平板车   20吨',
-                  style: TextStyle(fontSize: ScreenUtil().setWidth(24)),
-                  overflow: TextOverflow.ellipsis,),
-              ),
-            ]),
+            margin: EdgeInsets.only(left: 82, right: 2),
+            child: Text('车辆其他信息'),
           ),
         ],
       ),
     );
   }
 
+  Widget _headeLine() {
+    return Container(
+      margin: EdgeInsets.only(top: 20, bottom: 20),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Image.asset(
+            'images/index_apply_icon_choose_blue.png',
+            width: 20,
+          ),
+          Container(
+            margin: EdgeInsets.only(left: 2, right: 2),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(width: 1.0, color: Colors.black12),
+              ),
+            ),
+            width: 140,
+            height: 0,
+            child: Text('', textAlign: TextAlign.center),
+          ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Container(
+              width: 20,
+              height: 20,
+              color: Colors.black12,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
-//Widget _goodsList() {
-//  return Container(
-////    child: ,
-//  );
-//}
-
-//下拉部分
-  Widget _selectedBox(BuildContext context) {
+  Widget _formBox() {
     return Container(
       color: Colors.white,
-      padding: EdgeInsets.only(top: 2, bottom: 2, left: 10, right: 10),
-      width: double.infinity,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-//            _selectedItem('送：','全国'),
-//            _selectedItem('达：','全国'),
-//            _selectedItem('','智能排序'),
-//            _selectedItem('','筛选'),
-          _selectedItem2([
-            '全国',
-            '北京',
-            '上海',
-            '安徽',
-            '河南',
-            '湖北',
-            '湖南',
-            '江苏',
-            '山东',
-            '广东',
-            '江西',
-            '四川',
-            '云南',
-            '贵州',
-            '广西',
-            '陕西',
-            '内蒙',
-            '山西',
-            '新疆',
-            '西藏',
-            '黑龙江'
-          ], _mySelection1, changeFn: changeFn1),
-          _selectedItem2([
-            '上海',
-            '北京',
-            '安徽',
-            '河南',
-            '湖北',
-            '湖南',
-            '江苏',
-            '山东',
-            '广东',
-            '江西',
-            '四川',
-            '云南',
-            '贵州',
-            '广西',
-            '陕西',
-            '内蒙',
-            '山西',
-            '新疆',
-            '西藏',
-            '黑龙江'
-          ], _mySelection2, changeFn: changeFn2),
-          _selectedItem2(['智能排序'], _mySelection3),
-          _selectedItem2(
-              ['筛选', '接单时间', '发布时间'], _mySelection4, changeFn: changeFn4),
+      child: Column(
+        children: <Widget>[
+          _formList(Text('基础信息')),
+          _formList(_labelAndInput('车牌颜色', '请输入车牌颜色',inputControl: _nameController)),
+          _formList(_labelAndInput('车牌号', '请输入车牌号',inputControl: _nameController)),
+          _formList(_labelAndInput('发动机号', '请输入发动机号',inputControl: _nameController)),
+          _formList(_labelAndInput('车辆识别代码', '请输入车辆识别代码',inputControl: _nameController)),
+//          _formList(_labelAndInputYzm('验证码','请输入验证码',_inputController)),
         ],
       ),
     );
   }
 
-  _selectedItem2(lists, selected, {changeFn}) {
-    List<DropdownMenuItem<String>> ListsItems = [];
-
-    lists.forEach((item) {
-      ListsItems.add(DropdownMenuItem(
-          value: item, child: Text(item, overflow: TextOverflow.ellipsis,)));
-    });
-//    ListsItems.add(DropdownMenuItem(value: '价格降序价格降序', child: Text('价格降序价格降序')));
-//    ListsItems.add(DropdownMenuItem(value: '价格降序', child: Text('价格降序')));
-//    ListsItems.add(DropdownMenuItem(value: '价格升序', child: Text('价格升序')));
+  Widget _formcarBaseInfoBox() {
     return Container(
-      child: DropdownButtonHideUnderline(
-        child: DropdownButton(
-          value: selected,
-          items: ListsItems,
-          onChanged: (newVal) {
-//            setState(() {
-//              selected = newVal;
-//            });
-//            print(selected);
-            changeFn(newVal);
-          },
-        ),
+      margin: EdgeInsets.only(bottom: 15),
+      color: Colors.white,
+      child: Column(
+        children: <Widget>[
+          _formList(Text(
+            '货源信息',
+            style: TextStyle(
+                fontSize: ScreenUtil().setSp(32), fontWeight: FontWeight.w500),
+          )),
+          _formList(_labelAndInput('货物类型:', '请输入货物类型', inputControl:_goodsTypeController)),
+          _formList(_labelAndInput('重量:', '请输入重量', inputControl:_goodsWeightController,type: TextInputType.number)),
+          _formList(_labelAndInput('体积:', '请输入体积', inputControl:_goodsWeightController))
+        ],
       ),
     );
   }
 
-  Widget _selectedItem(prx, s) {
-    var selectedValue = '666';
-
+  Widget _formcarBaseInfoBox2() {
     return Container(
+      margin: EdgeInsets.only(bottom: 15),
+      color: Colors.white,
+      child: Column(
+        children: <Widget>[
+          _formList(Text(
+            '基本信息',
+            style: TextStyle(
+                fontSize: ScreenUtil().setSp(32), fontWeight: FontWeight.w500),
+          )),
+          _formList(_labelAndInput('装货时间:', '请输入装货时间', isNotInput: true,isNotInputChild: GestureDetector(
+            onTap: (){print('装货时间');showPicker();},
+            child: Text('${dateStr ?? MyDate.format('yyyy-MM-dd HH:mm:ss', date)}'),
+          ))),
+          _formList(_labelAndInput('付款方式:', '请输入付款方式', inputControl:_goodsWeightController)),
+          _formList(_labelAndInput('联系人:', '请输入联系人', inputControl:_goodsWeightController)),
+          _formList(_labelAndInput('联系电话:', '请输入联系电话', inputControl:_goodsWeightController,type: TextInputType.phone)),
+        ],
+      ),
+    );
+  }
 
-      child: Row(
-        children: [
-          Container(
-            child: Text(selectedValue),
-          ),
-          Text(s),
-          Container(
-            margin: EdgeInsets.only(right: 10),
-            child: Icon(Icons.keyboard_arrow_down),
+  Widget _formcarBaseInfoBox3() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 15),
+      color: Colors.white,
+      child: Column(
+        children: <Widget>[
+          _formList(Text(
+            '所需车源',
+            style: TextStyle(
+                fontSize: ScreenUtil().setSp(32), fontWeight: FontWeight.w500),
+          )),
+          _formList(_labelAndInput('车辆类型:', '请输入车辆类型', inputControl:_goodsWeightController)),
+          _formList(_labelAndInput('特殊要求:', '请输入特殊要求',inputControl: _goodsWeightController))
+        ],
+      ),
+    );
+  }
+
+  Widget _formStartEndAdress() {
+    return Container(
+      margin: EdgeInsets.only(bottom: 15),
+      color: Colors.white,
+      child: Column(
+        children: <Widget>[
+          _formList(Text(
+            '发货起始位置',
+            style: TextStyle(
+                fontSize: ScreenUtil().setSp(32), fontWeight: FontWeight.w500),
+          )),
+          _formList(
+              _labelAndInput('发货开始位置:', '请输入发货开始位置', inputControl:_addressStartController),hasOtherChild: true,OtherChild:Container(
+            height: 44,
+            padding: EdgeInsets.only(left: 20,right: 20),
+            child: InkWell(
+              onTap: () {
+                print('点击了地图1');
+              },
+              child: Image.asset('images/icon_addres_start.png',width: ScreenUtil().setWidth(50),height: ScreenUtil().setWidth(50)),
+            ),
+          )),
+          _formList(_labelAndInput('发货结束位置:', '请输入发货结束位置',inputControl: _addressEndController),hasOtherChild: true,OtherChild:Container(
+            height: 44,
+            padding: EdgeInsets.only(left: 20,right: 20),
+            child: InkWell(
+              onTap: () {
+                print('点击了地图2');
+              },
+              child: Image.asset('images/icon_addres_end.png',width: ScreenUtil().setWidth(50),height: ScreenUtil().setWidth(50)),
+            ),
+          )
           )
         ],
       ),
     );
   }
 
+  Widget _formList(widgit, {hasOtherChild=false,OtherChild}) {
+    return Stack(
+      children: [
+        Container(
+          color: Color(0xffffffff),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  margin: EdgeInsets.only(left: 15, right: 15),
+                  height: 46,
+                  alignment: Alignment.centerLeft,
+                  decoration: BoxDecoration(
+                    border: Border(
+                      bottom: BorderSide(width: 1.0, color: Colors.black12),
+                    ),
+                  ),
+                  child: widgit,
+                ),
+              ),
+            ],
+          ),
+        ),
+        hasOtherChild ==true? Positioned(
+          right: 0,
+          top: 0,
+          child: OtherChild,
+        ) : Text('')
+      ],
+    );
+  }
 
+  // 有输入框的列
+  Widget _labelAndInput(_lable, _phaceholder, {inputControl,type = TextInputType.text,isNotInput = false,isNotInputChild}) {
+    return Row(
+      children: <Widget>[
+        Text(_lable),
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.only(left: 15),
+            child: isNotInput ==false ? TextField(
+              controller: inputControl,
+              keyboardType:type,
+              decoration: InputDecoration(
+                hintText: _phaceholder,
+                border: InputBorder.none,
+              ),
+              style: TextStyle(fontSize: 14),
+            ) : isNotInputChild,
+          ),
+        )
+      ],
+    );
+  }
+
+//  带验证码，输入框的列
+  Widget _labelAndInputYzm(_lable, _phaceholder, _inputControl) {
+    return Row(
+      children: <Widget>[
+        Text(_lable),
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.only(left: 15),
+            child: TextField(
+              controller: _inputControl,
+              decoration: InputDecoration(
+                hintText: _phaceholder,
+                border: InputBorder.none,
+              ),
+              style: TextStyle(fontSize: 14),
+            ),
+          ),
+        ),
+        Container(
+          padding: EdgeInsets.only(left: 10),
+          height: 46,
+          alignment: Alignment.centerLeft,
+          decoration: BoxDecoration(
+            border: Border(
+              left: BorderSide(width: 1.0, color: Colors.black12),
+            ),
+          ),
+          child: Text(
+            '获取验证码',
+            style: TextStyle(color: Color(0xff108EE9)),
+          ),
+        )
+      ],
+    );
+  }
+
+  //按钮
+  Widget _nextButton(){
+    return Row(
+      children: <Widget>[
+        Expanded(
+          child: Container(
+            margin: EdgeInsets.only(top: 40,bottom: 20),
+            padding: EdgeInsets.only(left: 15,right: 15),
+            height: 40,
+            child: RaisedButton(
+              color:Color(0xff2D4ED1) ,
+              onPressed: (){
+                goToNextPage2();
+//              Navigator.push(
+//                context,
+//                MaterialPageRoute(builder: (context) {
+//                  return UserBaseInfoPage();
+//                }),
+//              );
+              },
+//            textColor: Color(0xff2D4ED1),
+              child: Text("发布",style: TextStyle(fontSize: 16,color: Colors.white),),
+            ),
+          ),
+        )
+      ],
+    );
+  }
 
 
 }
+
 

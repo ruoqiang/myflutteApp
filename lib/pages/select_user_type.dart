@@ -6,17 +6,19 @@ import 'dart:convert';
 // import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_swiper/flutter_swiper.dart';
 import 'package:myflutterapp/common/http.dart';
+import 'package:myflutterapp/pages/index_page2.dart';
 import 'package:myflutterapp/pages/login.dart';
-import 'package:myflutterapp/pages/search.dart';
 import 'package:myflutterapp/pages/user_base_info.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'index_page.dart';
 //import './search.dart';
-class HomeTestPage extends StatefulWidget {
+class SelectUserTypePage extends StatefulWidget {
   @override
-  _HomeTestPageState createState() => _HomeTestPageState();
+  _SelectUserTypePageState createState() => _SelectUserTypePageState();
 }
 
-class _HomeTestPageState extends State<HomeTestPage> {
+class _SelectUserTypePageState extends State<SelectUserTypePage> {
   String homePageContent='正在获取数据';
   List<Map> navigatorList = [];
   List<Map> slideList = [];
@@ -24,45 +26,30 @@ class _HomeTestPageState extends State<HomeTestPage> {
   @override
   void initState() {
     super.initState();
-    getHttp().then((val){
-      homePageContent = val.toString();
-      var data = json.decode(homePageContent); //json.decode反序列化，把json字符串转为对象
-      print(data);
-      setState(() {
-        navigatorList = (data['data']['category'] as List).cast(); //转化为可以通过属性调用的对象?
-        slideList = (data['data']['slides'] as List).cast(); //转化为可以通过属性调用的对象??
-      });
-      print(navigatorList);
-    });
+
   }
 
   @override
   Widget build(BuildContext context) {
     
     return Scaffold(
-      appBar: AppBar(title: Text('My testhPage2')),
+      appBar: AppBar(title: Text('选择用户')),
       body:Container(
           child:SingleChildScrollView(
             child: Column(
               children: <Widget>[
-                // navigatorList.length >0 ?TopNavigator(navigatorList: navigatorList) :new Text(''),
-                // TopNavigatorlist(navigatorList: navigatorList),
-                slideList.length >0 ?SlideList(slideList: slideList,):new Text(''),
-                new Text('ddd'),
-                new Text('ddddsswed'),
-                new Text('ddddsswed'),
-                new Text('ddddsswed'),
-                new Text('ddddsswed'),
-                new Text('ddddsswed'),
-                new Text('ddddsswed'),
-                new Text('ddddsswed'),
-                RaisedButton(child: Text('跳转到个人信息',style: TextStyle(color: Colors.deepPurple),),onPressed: () {
-                  checkToken();
-                  // Navigator.push(
-                  //   context,
-                  //   new MaterialPageRoute(builder: (context) => new UserBaseInfoPage()),
-                  // );
-                },),
+                new TextButton(
+                  onPressed: () {
+                    selectUserType('0');
+                  },
+                  child: Text('货主'),
+                ),
+                new TextButton(
+                  onPressed: () {
+                    selectUserType('1');
+                  },
+                  child: Text('司机'),
+                ),
               ],
             ),
           )
@@ -72,53 +59,20 @@ class _HomeTestPageState extends State<HomeTestPage> {
 
   }
 
-  Future getHttp() async{
-    try{
-      Response response;
-      Dio dio = Dio();
-      dio.options.contentType = "application/x-www-form-urlencoded";
 
-      var formData = {'lon':'115.02932','lat':'35.76189'};
-      response = await dio.post("http://v.jspang.com:8088/baixing/wxmini/homePageContent", data: formData);
-      
-      var result = response;//json.decode(response.toString());
-
-      return result.data;
-
-    }catch(e){
-      return print(e);
-    }
-  }
 //Main/MainQuest
 
- void checkToken() async {
+ void selectUserType(type) async {
    SharedPreferences  _prefs =  await SharedPreferences.getInstance();
-   var token = _prefs.getString('token');
-   var params = {
-      'token': token
-    };
-    
-    await post('Main/MainQuest',formData:params).then((val){
-       print('dddddd：>>>>>>>>>>>>>-----------------------------------$val');
-      // showToast('登录成功');
-      // _prefs.setString('token',val['result']['Token']);
-      // _prefs.setString('mobile',phoneController.text);
-      if(val['issuccess'] ==false) {
-        Navigator.push(
-         context,
-         MaterialPageRoute(builder: (context) {
-           return LoginPage();
-         }),
-       );
-      } else if(val['issuccess'] ==true) {
-        Navigator.push(
-         context,
-         MaterialPageRoute(builder: (context) {
-           return SearchPage();
-         }),
-       );
-      }
-    });
+  _prefs.setString('userType',type);
+  var pageList = [IndexPage2(),IndexPage()];
+   Navigator.pushAndRemoveUntil(
+       context,
+       MaterialPageRoute(builder: (context) {
+         return pageList[int.parse(type)];
+       }),(check) => false
+   );
+
  }
 
 }
